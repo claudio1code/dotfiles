@@ -1,0 +1,148 @@
+#!/bin/bash
+
+# Cores para output
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+echo -e "${BLUE}🚀 Iniciando o Setup do Kit Claudio...${NC}"
+
+# --- 1. DETECÇÃO DE AMBIENTE (42 vs CASA) ---
+if [ -d "$HOME/goinfre" ]; then
+    echo -e "${GREEN}🏫 Ambiente 42 detectado! Usando goinfre para economizar quota.${NC}"
+    BREW_DIR="$HOME/goinfre/.brew"
+else
+    echo -e "${GREEN}🏠 Ambiente Pessoal detectado. Instalando na home.${NC}"
+    BREW_DIR="$HOME/.brew"
+fi
+
+# --- 2. INSTALAÇÃO DO HOMEBREW ---
+if [ ! -d "$BREW_DIR" ]; then
+    echo -e "${BLUE}🍺 Instalando Homebrew em $BREW_DIR...${NC}"
+    git clone --depth=1 https://github.com/Homebrew/brew "$BREW_DIR"
+    
+    # Adiciona ao PATH temporariamente para este script usar
+    eval "$("$BREW_DIR/bin/brew" shellenv)"
+    brew update --force --quiet
+else
+    echo -e "${GREEN}✅ Homebrew já instalado.${NC}"
+    eval "$("$BREW_DIR/bin/brew" shellenv)"
+fi
+
+# --- 3. FERRAMENTAS MODERNAS (RUST SUITE) ---
+echo -e "${BLUE}📦 Instalando ferramentas (eza, bat, zoxide, fzf, oh-my-posh)...${NC}"
+brew install eza bat zoxide fzf oh-my-posh git
+
+# Instala atalhos do FZF automaticamente
+echo -e "${BLUE}🔍 Configurando FZF...${NC}"
+"$(brew --prefix)/opt/fzf/install" --all --no-bash --no-fish > /dev/null 2>&1
+
+# --- 4. NODE.JS & IA (NVM + GEMINI) ---
+echo -e "${BLUE}🤖 Configurando Node.js e Gemini AI...${NC}"
+export NVM_DIR="$HOME/.nvm"
+if [ ! -d "$NVM_DIR" ]; then
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+fi
+
+# Instala Node LTS e Gemini
+nvm install --lts
+nvm use --lts
+if ! command -v gemini &> /dev/null; then
+    npm install -g @google/gemini-cli
+fi
+
+# --- 5. ZSH & ZINIT ---
+echo -e "${BLUE}⚡ Instalando Zinit (Gerenciador de Plugins)...${NC}"
+if [ ! -d "$HOME/.local/share/zinit/zinit.git" ]; then
+    mkdir -p "$HOME/.local/share/zinit"
+    git clone https://github.com/zdharma-continuum/zinit.git "$HOME/.local/share/zinit/zinit.git"
+fi
+
+# --- 6. TEMA E CONFIGURAÇÃO ---
+echo -e "${BLUE}🎨 Baixando tema Kushal...${NC}"
+mkdir -p ~/.poshthemes
+curl -L https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/kushal.omp.json -o ~/.poshthemes/kushal.omp.json
+
+# --- 7. CRIANDO O GUIA DE ATALHOS ---
+echo -e "${BLUE}📚 Criando ~/.guia.md...${NC}"
+cat << 'EOF' > ~/.guia.md
+# 🚀 GUIA DE ATALHOS E FERRAMENTAS (CLÁUDIO)
+
+## 🧠 Zoxide (Navegação Inteligente)
+z <nome>      # Vai para uma pasta (ex: z push)
+z <nome> <tab> # Mostra opções
+z -           # Volta para a pasta anterior
+zi            # Lista interativa
+
+## 📂 Eza & Bat (Arquivos)
+ls            # Lista com ícones (eza)
+ls -T         # Árvore de arquivos
+cat <arq>     # Lê com cores (bat)
+
+## 🔍 FZF (Busca Rápida)
+Ctrl + T      # Achar ARQUIVOS
+Ctrl + R      # Achar COMANDOS (Histórico)
+
+## 🤖 Gemini (IA)
+gemini        # Chat
+gemini "txt"  # Pergunta rápida
+cat x | gemini "..." # Analisar arquivo
+
+## ⌨️ Atalhos Úteis
+Ctrl + L      # Limpar tela
+Ctrl + A / E  # Início / Fim da linha
+EOF
+
+# --- 8. GERANDO O .ZSHRC FINAL ---
+echo -e "${BLUE}📝 Gerando novo .zshrc...${NC}"
+cp ~/.zshrc ~/.zshrc.backup.$(date +%s) # Backup por segurança
+
+cat << EOF > ~/.zshrc
+# --- HOMEBREW ---
+# Detecta onde o brew está instalado (42 vs Casa)
+if [ -d "\$HOME/goinfre/.brew" ]; then
+    eval "\$(\$HOME/goinfre/.brew/bin/brew shellenv)"
+elif [ -d "\$HOME/.brew" ]; then
+    eval "\$(\$HOME/.brew/bin/brew shellenv)"
+elif [ -d "/home/linuxbrew/.linuxbrew" ]; then
+    eval "\$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
+# --- ZSH HISTORY ---
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt appendhistory sharehistory hist_ignore_dups
+
+# --- ZINIT ---
+source ~/.local/share/zinit/zinit.git/zinit.zsh
+zinit light zsh-users/zsh-autosuggestions
+zinit light zsh-users/zsh-syntax-highlighting
+
+# --- FERRAMENTAS ---
+eval "\$(zoxide init zsh)"
+
+# Aliases
+alias cat='bat --paging=never'
+alias ls='eza --icons'
+alias l='eza -l --icons'
+alias la='eza -la --icons'
+alias guia='bat ~/.guia.md'
+
+# FZF
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# NVM (Node)
+export NVM_DIR="\$HOME/.nvm"
+[ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh"
+[ -s "\$NVM_DIR/bash_completion" ] && \. "\$NVM_DIR/bash_completion"
+
+# --- OH MY POSH ---
+eval "\$(oh-my-posh init zsh --config ~/.poshthemes/kushal.omp.json)"
+EOF
+
+echo -e "${GREEN}✅ INSTALAÇÃO CONCLUÍDA!${NC}"
+echo -e "Reinicie o terminal ou digite: ${BLUE}source ~/.zshrc${NC}"
+echo -e "Para ver seus atalhos, digite: ${BLUE}guia${NC}"
