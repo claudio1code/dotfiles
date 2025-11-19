@@ -17,3 +17,13 @@ Abra seu terminal e rode este comando. O script fará todo o resto.
 
 ```bash
 sh -c "$(curl -fsSL [https://raw.githubusercontent.com/claudio1code/dotfiles/main/install.sh](https://raw.githubusercontent.com/claudio1code/dotfiles/main/install.sh))"
+
+---
+
+##  отдельно Vim Setup
+
+Se você deseja apenas a configuração do Vim, sem instalar todo o resto, use este comando:
+
+```bash
+curl -o ~/.vimrc https://raw.githubusercontent.com/claudio1code/dotfiles/main/.vimrc
+```
