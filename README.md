@@ -11,7 +11,7 @@ Configuração completa e automatizada para transformar o terminal em um ambient
 
 Este setup foi desenhado para funcionar tanto em **ambientes pessoais** (Linux/WSL) quanto no **ambiente da 42** (gerenciando permissões e quota no `goinfre`).
 
-## ⚡ Instalação Rápida
+## ⚡ Instalação Rápida do Terminal
 
 Abra seu terminal e rode este comando. O script fará todo o resto.
 
@@ -24,20 +24,43 @@ sh -c "$(curl -fsSL [https://raw.githubusercontent.com/claudio1code/dotfiles/mai
 Este script automatiza a instalação e configuração de um ambiente de terminal Zsh completo. Ele irá:
 
 - **Instalar o Homebrew:** Gerenciador de pacotes para macOS e Linux.
-- **Instalar Ferramentas Modernas:**
-  - `eza`: Um substituto moderno para o `ls` com ícones e cores.
-  - `bat`: Um substituto para o `cat` com syntax highlighting.
-  - `zoxide`: Um navegador de diretórios inteligente que aprende seus hábitos.
-  - `fzf`: Uma ferramenta de busca "fuzzy" para arquivos e histórico de comandos.
-  - `oh-my-posh`: Um motor de temas para o prompt do terminal.
-- **Configurar o Ambiente Node.js:** Instala o `nvm` para gerenciar versões do Node.js e instala a CLI do Gemini.
-- **Instalar Fontes:** Baixa e instala a `Meslo Nerd Font`, necessária para os ícones do prompt.
-- **Gerar o `.zshrc`:** Cria um arquivo de configuração `.zshrc` que ativa todas as ferramentas, plugins (como auto-sugestões e syntax highlighting) e aliases.
+- **Instalar Ferramentas Modernas:** `eza`, `bat`, `zoxide`, `fzf`, `oh-my-posh`.
+- **Configurar o Ambiente Node.js:** Instala `nvm` e a CLI do Gemini.
+- **Instalar Fontes:** Baixa e instala a `Meslo Nerd Font` para ícones no terminal.
+- **Gerar o `.zshrc`:** Cria um arquivo de configuração `.zshrc` que ativa todas as ferramentas e plugins.
 
 ---
 
-## Configuração do Vim
+## ⚙️ Configuração do Vim
 
-Para uma configuração detalhada e separada do Vim, incluindo um guia de atalhos, veja nosso guia completo:
+Esta configuração (`.vimrc`) transforma o Vim padrão em um editor de código mais amigável e poderoso.
 
-[➡️ **Guia de Configuração do Vim**](./VIM_SETUP.md)
+### Instalação Rápida do Vim
+
+Use este comando para baixar o arquivo `.vimrc` para sua pasta de usuário:
+
+```bash
+curl -o ~/.vimrc https://raw.githubusercontent.com/claudio1code/dotfiles/main/.vimrc
+```
+
+**Importante:** Após baixar o `.vimrc`, abra o Vim e execute o comando `:PlugInstall` para instalar os plugins.
+
+### O que o `.vimrc` faz?
+
+- **Adiciona Plugins Essenciais** com o `vim-plug`:
+  - `NERDTree`: Uma árvore de arquivos lateral (atalho: `Ctrl + n`).
+  - `vim-airline`: Uma barra de status moderna e informativa.
+  - `dracula/vim`: Um tema de cores agradável e popular.
+  - `vim-mucomplete`: Um sistema de autocompletar leve.
+- **Melhora a Experiência de Edição:** Ativa números de linha, syntax highlighting, auto-indentação, `Tab` com 4 espaços e "undo" persistente.
+- **Facilita a Navegação:** Melhora buscas e habilita o uso do mouse.
+
+### Guia de Atalhos Essenciais do Vim
+
+- **Modos:** `i` (Inserção), `v` (Visual), `<ESC>` (Normal).
+- **Navegação:** `h`, `j`, `k`, `l`, `w` (palavra), `b` (palavra anterior), `gg` (início do arq), `G` (fim do arq).
+- **Edição:** `x` (apagar), `dd` (apagar linha), `yy` (copiar linha), `p` (colar), `u` (desfazer).
+- **Comandos:** `:w` (salvar), `:q` (sair), `:wq` (salvar e sair), `:q!` (sair sem salvar).
+- **Splits:** `:vsplit arquivo` (vertical), `:split arquivo` (horizontal), `<C-w> + hjkl` (navegar).
+- **Busca:** `/palavra`.
+- **Substituição:** `:%s/antigo/novo/g`.
