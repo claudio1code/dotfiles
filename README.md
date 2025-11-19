@@ -31,6 +31,27 @@ Este script automatiza a instalação e configuração de um ambiente de termina
 
 ---
 
+---
+
+## 🔄 Atualizando a Configuração
+
+Para receber as últimas atualizações deste repositório, siga os passos abaixo:
+
+1.  **Navegue até o diretório local dos dotfiles:**
+    ```bash
+    cd <caminho_para_seu_repositorio_dotfiles>
+    ```
+2.  **Puxe as últimas alterações do GitHub:**
+    ```bash
+    git pull
+    ```
+3.  **Execute o script de instalação novamente para aplicar as mudanças:**
+    ```bash
+    sh install.sh
+    ```
+
+---
+
 ## ⚙️ Configuração do Vim
 
 Esta configuração (`.vimrc`) transforma o Vim padrão em um editor de código mais amigável e poderoso.
