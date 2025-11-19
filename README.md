@@ -44,26 +44,15 @@ Este setup irá clonar o repositório para `~/.dotfiles` e configurar as seguint
 ---
 ## ⚙️ Configuração do Vim
 
-Esta configuração (`.vimrc`) transforma o Vim padrão em um editor de código mais amigável e poderoso.
+Se você quer apenas a configuração do Vim, sem o resto do ambiente, pode usar este comando:
+
+```bash
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/claudio1code/dotfiles/main/install_vim.sh)"
+```
+
+Isso irá:
+- Clonar o repositório (se ainda não existir).
+- Instalar o `vim-plug` (gerenciador de plugins).
+- Criar o link simbólico para o seu `.vimrc`.
 
 **Importante:** Após a instalação, abra o Vim e execute o comando `:PlugInstall` para instalar os plugins.
-
-### O que o `.vimrc` faz?
-
-- **Adiciona Plugins Essenciais** com o `vim-plug`:
-  - `NERDTree`: Uma árvore de arquivos lateral (atalho: `Ctrl + n`).
-  - `vim-airline`: Uma barra de status moderna e informativa.
-  - `dracula/vim`: Um tema de cores agradável e popular.
-  - `vim-mucomplete`: Um sistema de autocompletar leve.
-- **Melhora a Experiência de Edição:** Ativa números de linha, syntax highlighting, auto-indentação, `Tab` com 4 espaços e "undo" persistente.
-- **Facilita a Navegação:** Melhora buscas e habilita o uso do mouse.
-
-### Guia de Atalhos Essenciais do Vim
-
-- **Modos:** `i` (Inserção), `v` (Visual), `<ESC>` (Normal).
-- **Navegação:** `h`, `j`, `k`, `l`, `w` (palavra), `b` (palavra anterior), `gg` (início do arq), `G` (fim do arq).
-- **Edição:** `x` (apagar), `dd` (apagar linha), `yy` (copiar linha), `p` (colar), `u` (desfazer).
-- **Comandos:** `:w` (salvar), `:q` (sair), `:wq` (salvar e sair), `:q!` (sair sem salvar).
-- **Splits:** `:vsplit arquivo` (vertical), `:split arquivo` (horizontal), `<C-w> + hjkl` (navegar).
-- **Busca:** `/palavra`.
-- **Substituição:** `:%s/antigo/novo/g`.
