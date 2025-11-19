@@ -11,60 +11,42 @@ Configuração completa e automatizada para transformar o terminal em um ambient
 
 Este setup foi desenhado para funcionar tanto em **ambientes pessoais** (Linux/WSL) quanto no **ambiente da 42** (gerenciando permissões e quota no `goinfre`).
 
-## ⚡ Instalação Rápida do Terminal
+## ⚡ Instalação Rápida
 
 Abra seu terminal e rode este comando. O script fará todo o resto.
 
 ```bash
-sh -c "$(curl -fsSL [https://raw.githubusercontent.com/claudio1code/dotfiles/main/install.sh](https://raw.githubusercontent.com/claudio1code/dotfiles/main/install.sh))"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/claudio1code/dotfiles/main/install.sh)"
 ```
 
-### O que o `install.sh` faz?
+## 🔄 Como Atualizar
 
-Este script automatiza a instalação e configuração de um ambiente de terminal Zsh completo. Ele irá:
+Para atualizar sua configuração com as últimas mudanças do repositório, rode o seguinte comando no seu terminal:
 
-- **Instalar o Homebrew:** Gerenciador de pacotes para macOS e Linux.
-- **Instalar Ferramentas Modernas:** `eza`, `bat`, `zoxide`, `fzf`, `oh-my-posh`.
-- **Configurar o Ambiente Node.js:** Instala `nvm` e a CLI do Gemini.
-- **Instalar Fontes:** Baixa e instala a `Meslo Nerd Font` para ícones no terminal.
-- **Gerar o `.zshrc`:** Cria um arquivo de configuração `.zshrc` que ativa todas as ferramentas e plugins.
+```bash
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/claudio1code/dotfiles/main/update.sh)"
+```
 
 ---
 
----
+## O que está incluso?
 
-## 🔄 Atualizando a Configuração
+Este setup irá clonar o repositório para `~/.dotfiles` e configurar as seguintes ferramentas:
 
-Para receber as últimas atualizações deste repositório, siga os passos abaixo:
-
-1.  **Navegue até o diretório local dos dotfiles:**
-    ```bash
-    cd <caminho_para_seu_repositorio_dotfiles>
-    ```
-2.  **Puxe as últimas alterações do GitHub:**
-    ```bash
-    git pull
-    ```
-3.  **Execute o script de instalação novamente para aplicar as mudanças:**
-    ```bash
-    sh install.sh
-    ```
+- **Homebrew:** Gerenciador de pacotes para macOS e Linux.
+- **Ferramentas Modernas:** `eza`, `bat`, `zoxide`, `fzf`, `oh-my-posh`.
+- **Ambiente Node.js:** Instala `nvm` e a CLI do Gemini.
+- **Fontes:** Baixa e instala a `Meslo Nerd Font` para ícones no terminal.
+- **Zsh com Zinit:** Um ambiente de shell rápido com autocompletar e syntax highlighting.
+- **Configuração do Vim:** Transforma o Vim em um editor de código mais amigável e poderoso com plugins essenciais.
+- **Guia de Atalhos:** Um guia rápido (`guia`) com os principais atalhos e comandos.
 
 ---
-
 ## ⚙️ Configuração do Vim
 
 Esta configuração (`.vimrc`) transforma o Vim padrão em um editor de código mais amigável e poderoso.
 
-### Instalação Rápida do Vim
-
-Use este comando para baixar o arquivo `.vimrc` para sua pasta de usuário:
-
-```bash
-curl -o ~/.vimrc https://raw.githubusercontent.com/claudio1code/dotfiles/main/.vimrc
-```
-
-**Importante:** Após baixar o `.vimrc`, abra o Vim e execute o comando `:PlugInstall` para instalar os plugins.
+**Importante:** Após a instalação, abra o Vim e execute o comando `:PlugInstall` para instalar os plugins.
 
 ### O que o `.vimrc` faz?
 
