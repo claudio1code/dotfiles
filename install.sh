@@ -189,4 +189,5 @@ chmod +x "$DOTFILES_DIR/update.sh"
 echo -e "  ${GREEN}✅ Guia e script de update criados.${NC}"
 
 echo -e "${GREEN}✅ INSTALAÇÃO CONCLUÍDA!${NC}"
-echo -e "Reinicie
+echo -e "Reinicie o terminal ou digite: ${BLUE}source ~/.zshrc${NC}"
+echo -e "Para autenticar o Gemini, rode: ${BLUE}gemini${NC}"
