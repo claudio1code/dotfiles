@@ -1,5 +1,5 @@
 # --- HOMEBREW ---
-# Detecta onde o brew está instalado (42 vs Casa)
+# Mantemos a detecção caso precise usar brew no futuro (mas a instalação não depende dele)
 if [ -d "$HOME/goinfre/.brew" ]; then
     eval "$($HOME/goinfre/.brew/bin/brew shellenv)"
 elif [ -d "$HOME/.brew" ]; then
@@ -32,10 +32,14 @@ alias guia='bat ~/.guia.md'
 # FZF
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# NVM (Node)
+# --- NVM (Node.js) ---
+# Correção: Carrega o NVM corretamente sem quebras de linha erradas
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
 
 # --- OH MY POSH ---
 eval "$(oh-my-posh init zsh --config ~/.poshthemes/kushal.omp.json)"
+
+# Dica: Para usar o Gemini, basta digitar 'gemini' no terminal.
+# Se pedir login, ele abrirá o navegador automaticamente.
