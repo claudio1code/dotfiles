@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e # Exit immediately if a command exits with a non-zero status.
+set -e # Sai imediatamente se algum comando falhar
 
 # Cores para output
 GREEN='\033[0;32m'
@@ -21,8 +21,8 @@ fi
 # Garante que estamos no diretório do repositório
 cd "$DOTFILES_DIR"
 
-# --- 2. INSTALAÇÃO DE FERRAMENTAS MODERNAS (SEM BREW) ---
-echo -e "${BLUE}📦 Instalando/Verificando ferramentas...${NC}"
+# --- 2. INSTALAÇÃO DE FERRAMENTAS MODERNAS (SEM HOMEBREW) ---
+echo -e "${BLUE}📦 Instalando/Verificando ferramentas (Binários Diretos)...${NC}"
 
 LOCAL_BIN="$HOME/.local/bin"
 mkdir -p "$LOCAL_BIN"
@@ -32,7 +32,7 @@ if [[ ":$PATH:" != *":$LOCAL_BIN:"* ]]; then
     export PATH="$LOCAL_BIN:$PATH"
 fi
 
-# Função para instalar ferramentas de forma idempotente
+# Função para instalar ferramentas baixando binários (bypass Homebrew)
 install_tool() {
     local tool_name=$1
     local download_url=$2
@@ -61,11 +61,12 @@ install_tool() {
     fi
 }
 
+# Instala Eza, Bat e Zoxide via binário direto
 install_tool "eza" "https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz" "eza"
 install_tool "bat" "https://github.com/sharkdp/bat/releases/download/v0.24.0/bat-v0.24.0-x86_64-unknown-linux-gnu.tar.gz" "bat-v0.24.0-x86_64-unknown-linux-gnu/bat" 1
 install_tool "zoxide" "https://github.com/ajeetdsouza/zoxide/releases/download/v0.9.4/zoxide-0.9.4-x86_64-unknown-linux-musl.tar.gz" "zoxide"
 
-# Oh-my-posh
+# Oh-my-posh (via script oficial)
 if ! command -v oh-my-posh &> /dev/null; then
     echo "  -> Instalando oh-my-posh..."
     curl -s https://ohmyposh.dev/install.sh | bash -s -- -d "$LOCAL_BIN"
@@ -73,7 +74,7 @@ else
     echo -e "  ${GREEN}✅ oh-my-posh já está instalado.${NC}"
 fi
 
-# FZF (ainda usa o método de clone do git, que é bem universal)
+# FZF (via git clone, método universal)
 if [ ! -d "$HOME/.fzf" ]; then
     echo "  -> Instalando fzf..."
     git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
@@ -82,26 +83,30 @@ else
     echo -e "  ${GREEN}✅ fzf já está instalado.${NC}"
 fi
 
-# --- 3. NODE.JS & IA (NVM) ---
-echo -e "${BLUE}🤖 Configurando Node.js via NVM...${NC}"
+# --- 3. NODE.JS & GEMINI (VIA NVM) ---
+echo -e "${BLUE}🤖 Configurando Node.js e IA...${NC}"
+
+# 3.1 Instala NVM se não existir
 export NVM_DIR="$HOME/.nvm"
 if [ ! -s "$NVM_DIR/nvm.sh" ]; then
     echo "  -> Instalando NVM..."
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 fi
 
-# Carrega o NVM corretamente para usar neste script
+# 3.2 Carrega o NVM para usar AGORA (Correção Importante)
 [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
 
+# 3.3 Instala Node LTS
 if ! nvm list | grep -q "lts"; then
     echo "  -> Instalando Node.js LTS..."
     nvm install --lts
     nvm use --lts
 else
     echo -e "  ${GREEN}✅ Node.js LTS já instalado.${NC}"
+    nvm use --lts > /dev/null
 fi
 
-# --- INSTALAÇÃO DO GEMINI CLI (Novo) ---
+# 3.4 Instala Gemini CLI (A solução "No-Homebrew")
 if ! command -v gemini &> /dev/null; then
     echo "  -> Instalando Google Gemini CLI..."
     npm install -g @google/gemini-cli
@@ -137,41 +142,31 @@ fi
 
 # --- 6. SYMLINKING DOTFILES ---
 echo -e "${BLUE}🔗 Criando symlinks para os dotfiles...${NC}"
-# Assumindo que os arquivos de configuração estão na raiz do repositório
 ln -sf "$DOTFILES_DIR/vimrc" "$HOME/.vimrc"
 ln -sf "$DOTFILES_DIR/zshrc" "$HOME/.zshrc"
-# Adicione outros links conforme necessário
 echo -e "  ${GREEN}✅ Symlinks criados.${NC}"
 
-
 # --- 7. CRIANDO SCRIPTS E GUIAS ---
-echo -e "${BLUE}📝 Criando guia e script de update...${NC}"
+echo -e "${BLUE}📝 Atualizando guia e scripts...${NC}"
 
-# Guia
+# Guia Atualizado
 cat << 'EOF' > "$HOME/.guia.md"
 # 🚀 GUIA DE ATALHOS E FERRAMENTAS (CLÁUDIO)
 ## 🧠 Zoxide (Navegação Inteligente)
 z <nome>      # Vai para uma pasta (ex: z push)
-z <nome> <tab> # Mostra opções
 z -           # Volta para a pasta anterior
-zi            # Lista interativa
 
-## 📂 Eza & Bat (Arquivos)
+## 📂 Arquivos
 ls            # Lista com ícones (eza)
-ls -T         # Árvore de arquivos
 cat <arq>     # Lê com cores (bat)
-
-## 🔍 FZF (Busca Rápida)
-Ctrl + T      # Achar ARQUIVOS
-Ctrl + R      # Achar COMANDOS (Histórico)
 
 ## 🤖 Gemini (IA)
 gemini        # Abre o chat interativo (Login na 1ª vez)
-gemini --prompt "Pergunda"  # Pergunta rápida
+gemini "msg"  # Pergunta rápida
 
-## ⌨️ Atalhos Úteis
+## ⌨️ Atalhos
 Ctrl + L      # Limpar tela
-Ctrl + A / E  # Início / Fim da linha
+Ctrl + R      # Histórico de comandos
 EOF
 
 # Update Script
@@ -186,8 +181,6 @@ echo "Update complete!"
 EOF
 chmod +x "$DOTFILES_DIR/update.sh"
 
-echo -e "  ${GREEN}✅ Guia e script de update criados.${NC}"
-
 echo -e "${GREEN}✅ INSTALAÇÃO CONCLUÍDA!${NC}"
 echo -e "Reinicie o terminal ou digite: ${BLUE}source ~/.zshrc${NC}"
-echo -e "Para autenticar o Gemini, rode: ${BLUE}gemini${NC}"
+echo -e "Para usar a IA pela primeira vez, digite: ${BLUE}gemini${NC}"
