@@ -89,7 +89,9 @@ if [ ! -s "$NVM_DIR/nvm.sh" ]; then
     echo "  -> Instalando NVM..."
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 fi
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+# Carrega o NVM corretamente para usar neste script
+[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
 
 if ! nvm list | grep -q "lts"; then
     echo "  -> Instalando Node.js LTS..."
@@ -97,6 +99,15 @@ if ! nvm list | grep -q "lts"; then
     nvm use --lts
 else
     echo -e "  ${GREEN}✅ Node.js LTS já instalado.${NC}"
+fi
+
+# --- INSTALAÇÃO DO GEMINI CLI (Novo) ---
+if ! command -v gemini &> /dev/null; then
+    echo "  -> Instalando Google Gemini CLI..."
+    npm install -g @google/gemini-cli
+    echo -e "  ${GREEN}✅ Gemini CLI instalado.${NC}"
+else
+    echo -e "  ${GREEN}✅ Gemini CLI já está instalado.${NC}"
 fi
 
 # --- 4. ZSH & ZINIT ---
@@ -140,7 +151,27 @@ echo -e "${BLUE}📝 Criando guia e script de update...${NC}"
 cat << 'EOF' > "$HOME/.guia.md"
 # 🚀 GUIA DE ATALHOS E FERRAMENTAS (CLÁUDIO)
 ## 🧠 Zoxide (Navegação Inteligente)
-... (conteúdo do guia) ...
+z <nome>      # Vai para uma pasta (ex: z push)
+z <nome> <tab> # Mostra opções
+z -           # Volta para a pasta anterior
+zi            # Lista interativa
+
+## 📂 Eza & Bat (Arquivos)
+ls            # Lista com ícones (eza)
+ls -T         # Árvore de arquivos
+cat <arq>     # Lê com cores (bat)
+
+## 🔍 FZF (Busca Rápida)
+Ctrl + T      # Achar ARQUIVOS
+Ctrl + R      # Achar COMANDOS (Histórico)
+
+## 🤖 Gemini (IA)
+gemini        # Abre o chat interativo (Login na 1ª vez)
+gemini --prompt "Pergunda"  # Pergunta rápida
+
+## ⌨️ Atalhos Úteis
+Ctrl + L      # Limpar tela
+Ctrl + A / E  # Início / Fim da linha
 EOF
 
 # Update Script
@@ -158,5 +189,4 @@ chmod +x "$DOTFILES_DIR/update.sh"
 echo -e "  ${GREEN}✅ Guia e script de update criados.${NC}"
 
 echo -e "${GREEN}✅ INSTALAÇÃO CONCLUÍDA!${NC}"
-echo -e "Reinicie o terminal ou digite: ${BLUE}source ~/.zshrc${NC}"
-echo -e "Para atualizar no futuro, rode: ${BLUE}bash ~/dotfiles/update.sh${NC}"
+echo -e "Reinicie
