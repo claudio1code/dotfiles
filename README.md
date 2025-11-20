@@ -11,56 +11,48 @@ Configuração completa e automatizada para transformar o terminal em um ambient
 
 Este setup foi desenhado para funcionar tanto em **ambientes pessoais** (Linux/WSL) quanto no **ambiente da 42** (gerenciando permissões e quota no `goinfre`).
 
-## ⚡ Instalação Rápida do Terminal
+## ⚡ Instalação Rápida
 
 Abra seu terminal e rode este comando. O script fará todo o resto.
 
 ```bash
-sh -c "$(curl -fsSL [https://raw.githubusercontent.com/claudio1code/dotfiles/main/install.sh](https://raw.githubusercontent.com/claudio1code/dotfiles/main/install.sh))"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/claudio1code/dotfiles/main/install.sh)"
 ```
 
-### O que o `install.sh` faz?
+## 🔄 Como Atualizar
 
-Este script automatiza a instalação e configuração de um ambiente de terminal Zsh completo. Ele irá:
+Para atualizar sua configuração com as últimas mudanças do repositório, rode o seguinte comando no seu terminal:
 
-- **Instalar o Homebrew:** Gerenciador de pacotes para macOS e Linux.
-- **Instalar Ferramentas Modernas:** `eza`, `bat`, `zoxide`, `fzf`, `oh-my-posh`.
-- **Configurar o Ambiente Node.js:** Instala `nvm` e a CLI do Gemini.
-- **Instalar Fontes:** Baixa e instala a `Meslo Nerd Font` para ícones no terminal.
-- **Gerar o `.zshrc`:** Cria um arquivo de configuração `.zshrc` que ativa todas as ferramentas e plugins.
+```bash
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/claudio1code/dotfiles/main/update.sh)"
+```
 
 ---
 
+## O que está incluso?
+
+Este setup irá clonar o repositório para `~/.dotfiles` e configurar as seguintes ferramentas:
+
+- **Homebrew:** Gerenciador de pacotes para macOS e Linux.
+- **Ferramentas Modernas:** `eza`, `bat`, `zoxide`, `fzf`, `oh-my-posh`.
+- **Ambiente Node.js:** Instala `nvm` e a CLI do Gemini.
+- **Fontes:** Baixa e instala a `Meslo Nerd Font` para ícones no terminal.
+- **Zsh com Zinit:** Um ambiente de shell rápido com autocompletar e syntax highlighting.
+- **Configuração do Vim:** Transforma o Vim em um editor de código mais amigável e poderoso com plugins essenciais.
+- **Guia de Atalhos:** Um guia rápido (`guia`) com os principais atalhos e comandos.
+
+---
 ## ⚙️ Configuração do Vim
 
-Esta configuração (`.vimrc`) transforma o Vim padrão em um editor de código mais amigável e poderoso.
-
-### Instalação Rápida do Vim
-
-Use este comando para baixar o arquivo `.vimrc` para sua pasta de usuário:
+Se você quer apenas a configuração do Vim, sem o resto do ambiente, pode usar este comando:
 
 ```bash
-curl -o ~/.vimrc https://raw.githubusercontent.com/claudio1code/dotfiles/main/.vimrc
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/claudio1code/dotfiles/main/install_vim.sh)"
 ```
 
-**Importante:** Após baixar o `.vimrc`, abra o Vim e execute o comando `:PlugInstall` para instalar os plugins.
+Isso irá:
+- Clonar o repositório (se ainda não existir).
+- Instalar o `vim-plug` (gerenciador de plugins).
+- Criar o link simbólico para o seu `.vimrc`.
 
-### O que o `.vimrc` faz?
-
-- **Adiciona Plugins Essenciais** com o `vim-plug`:
-  - `NERDTree`: Uma árvore de arquivos lateral (atalho: `Ctrl + n`).
-  - `vim-airline`: Uma barra de status moderna e informativa.
-  - `dracula/vim`: Um tema de cores agradável e popular.
-  - `vim-mucomplete`: Um sistema de autocompletar leve.
-- **Melhora a Experiência de Edição:** Ativa números de linha, syntax highlighting, auto-indentação, `Tab` com 4 espaços e "undo" persistente.
-- **Facilita a Navegação:** Melhora buscas e habilita o uso do mouse.
-
-### Guia de Atalhos Essenciais do Vim
-
-- **Modos:** `i` (Inserção), `v` (Visual), `<ESC>` (Normal).
-- **Navegação:** `h`, `j`, `k`, `l`, `w` (palavra), `b` (palavra anterior), `gg` (início do arq), `G` (fim do arq).
-- **Edição:** `x` (apagar), `dd` (apagar linha), `yy` (copiar linha), `p` (colar), `u` (desfazer).
-- **Comandos:** `:w` (salvar), `:q` (sair), `:wq` (salvar e sair), `:q!` (sair sem salvar).
-- **Splits:** `:vsplit arquivo` (vertical), `:split arquivo` (horizontal), `<C-w> + hjkl` (navegar).
-- **Busca:** `/palavra`.
-- **Substituição:** `:%s/antigo/novo/g`.
+**Importante:** Após a instalação, abra o Vim e execute o comando `:PlugInstall` para instalar os plugins.
