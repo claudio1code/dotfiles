@@ -1,12 +1,3 @@
-# dotfiles
-Terminal custumizado e com ferramentas de produção
-
-# 🚀 Ultimate Terminal Setup (Dotfiles)
-
-![License](https://img.shields.io/github/license/claudio1code/dotfiles?style=flat-square)
-![Shell](https://img.shields.io/badge/Shell-Zsh-blue?style=flat-square&logo=zsh)
-![Environment](https://img.shields.io/badge/Environment-42%20SP%20%7C%20Linux%20%7C%20WSL-success?style=flat-square)
-
 # 🚀 Ultimate Terminal Setup (Dotfiles)
 
 ![License](https://img.shields.io/github/license/claudio1code/dotfiles?style=flat-square)
