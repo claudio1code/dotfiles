@@ -30,13 +30,85 @@ else
     eval "$("$BREW_DIR/bin/brew" shellenv)"
 fi
 
-# --- 3. FERRAMENTAS MODERNAS (RUST SUITE) ---
-echo -e "${BLUE}📦 Instalando ferramentas (eza, bat, zoxide, fzf, oh-my-posh)...${NC}"
-brew install eza bat zoxide fzf oh-my-posh git
+# --- 3. FERRAMENTAS MODERNAS (INSTALAÇÃO MANUAL SEM BREW) ---
+echo -e "${BLUE}📦 Instalando ferramentas (eza, bat, zoxide, oh-my-posh)...${NC}"
 
-# Instala atalhos do FZF automaticamente
-echo -e "${BLUE}🔍 Configurando FZF...${NC}"
-"$(brew --prefix)/opt/fzf/install" --all --no-bash --no-fish > /dev/null 2>&1
+# Define o diretório de binários locais e o adiciona ao PATH
+LOCAL_BIN="$HOME/.local/bin"
+mkdir -p "$LOCAL_BIN"
+
+# Função para checar se a ferramenta já foi adicionada ao PATH do script atual
+path_contains() {
+    case ":$PATH:" in
+        *":$1:"*) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+# Adiciona ao PATH do script atual para garantir que os comandos sejam encontrados
+if ! path_contains "$LOCAL_BIN"; then
+    export PATH="$LOCAL_BIN:$PATH"
+fi
+
+# Eza (substituto do ls)
+if ! command -v eza &> /dev/null; then
+    echo "  -> Instalando eza..."
+    TEMP_DIR=$(mktemp -d)
+    wget -qO "$TEMP_DIR/eza.tar.gz" https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz
+    tar -xf "$TEMP_DIR/eza.tar.gz" -C "$LOCAL_BIN"
+    rm -r "$TEMP_DIR"
+else
+    echo "  -> eza já está instalado."
+fi
+
+# Bat (substituto do cat)
+if ! command -v bat &> /dev/null; then
+    echo "  -> Instalando bat..."
+    TEMP_DIR=$(mktemp -d)
+    wget -qO "$TEMP_DIR/bat.tar.gz" https://github.com/sharkdp/bat/releases/download/v0.24.0/bat-v0.24.0-x86_64-unknown-linux-gnu.tar.gz
+    tar xf "$TEMP_DIR/bat.tar.gz" --strip-components=1 -C "$LOCAL_BIN" bat-v0.24.0-x86_64-unknown-linux-gnu/bat
+    rm -r "$TEMP_DIR"
+else
+    echo "  -> bat já está instalado."
+fi
+
+# Zoxide (cd inteligente)
+if ! command -v zoxide &> /dev/null; then
+    echo "  -> Instalando zoxide..."
+    TEMP_DIR=$(mktemp -d)
+    wget -qO "$TEMP_DIR/zoxide.tar.gz" https://github.com/ajeetdsouza/zoxide/releases/download/v0.9.4/zoxide-0.9.4-x86_64-unknown-linux-musl.tar.gz
+    tar -xf "$TEMP_DIR/zoxide.tar.gz" -C "$LOCAL_BIN" zoxide
+    rm -r "$TEMP_DIR"
+else
+    echo "  -> zoxide já está instalado."
+fi
+
+# Oh-my-posh (tema do prompt)
+if ! command -v oh-my-posh &> /dev/null; then
+    echo "  -> Instalando oh-my-posh..."
+    # A flag -d aponta o diretório de instalação
+    curl -s https://ohmyposh.dev/install.sh | bash -s -- -d "$LOCAL_BIN"
+else
+    echo "  -> oh-my-posh já está instalado."
+fi
+
+# Git e FZF
+echo -e "${BLUE}📦 Verificando dependências restantes (git, fzf)...${NC}"
+if ! command -v git &> /dev/null; then
+    echo -e "${RED}  -> Git não encontrado. Instale-o com o gerenciador de pacotes do seu sistema (ex: sudo apt install git) e rode o script novamente.${NC}"
+    exit 1
+fi
+if ! command -v fzf &> /dev/null; then
+    echo "  -> Tentando instalar FZF com brew..."
+    if command -v brew &> /dev/null; then
+        brew install fzf
+        "$(brew --prefix)/opt/fzf/install" --all --no-bash --no-fish > /dev/null 2>&1
+    else
+        echo -e "${RED}  -> Brew não está funcional. Pulei a instalação do FZF. Considere instalar manualmente.${NC}"
+    fi
+else
+    echo "  -> fzf já está instalado."
+fi
 
 # --- 4. NODE.JS & IA (NVM + GEMINI) ---
 echo -e "${BLUE}🤖 Configurando Node.js e Gemini AI...${NC}"
@@ -123,6 +195,10 @@ echo -e "${BLUE}📝 Gerando novo .zshrc...${NC}"
 cp ~/.zshrc ~/.zshrc.backup.$(date +%s) # Backup por segurança
 
 cat << EOF > ~/.zshrc
+# --- PATH LOCAL ---
+# Adiciona o diretório de binários locais ao início do PATH
+export PATH="\$HOME/.local/bin:\$PATH"
+
 # --- HOMEBREW ---
 # Detecta onde o brew está instalado (42 vs Casa)
 if [ -d "\$HOME/goinfre/.brew" ]; then
