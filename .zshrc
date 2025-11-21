@@ -43,3 +43,7 @@ eval "$(oh-my-posh init zsh --config ~/.poshthemes/kushal.omp.json)"
 
 # Dica: Para usar o Gemini, basta digitar 'gemini' no terminal.
 # Se pedir login, ele abrirá o navegador automaticamente.
+
+# Navegação palavra por palavra com Ctrl + Setas
+bindkey '^[[1;5D' backward-word
+bindkey '^[[1;5C' forward-word
