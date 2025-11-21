@@ -33,7 +33,7 @@ alias guia='bat ~/.guia.md'
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # --- NVM (Node.js) ---
-# Correção: Carrega o NVM corretamente sem quebras de linha erradas
+# NVM (Node) - Corrigido
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
