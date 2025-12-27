@@ -1,186 +1,239 @@
 #!/bin/bash
-set -e # Sai imediatamente se algum comando falhar
+set -e # Exit immediately if a command exits with a non-zero status.
 
-# Cores para output
+# Colors for output
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}🚀 Iniciando o Setup do Kit Claudio...${NC}"
+# 1. DYNAMIC REPOSITORY PATH
+# Get the directory where this script is located
+REPO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+echo -e "${BLUE}🚀 Starting Dotfiles Setup from: ${REPO_DIR}${NC}"
 
-# --- 1. SETUP DOTFILES REPO ---
-DOTFILES_DIR="$HOME/dotfiles"
-if [ ! -d "$DOTFILES_DIR" ]; then
-    echo -e "${RED}ERRO: Este script deve ser executado de dentro do repositório 'dotfiles' clonado.${NC}"
-    exit 1
-else
-    echo -e "${GREEN}✅ Repositório de dotfiles encontrado em $DOTFILES_DIR.${NC}"
-fi
-
-# Garante que estamos no diretório do repositório
-cd "$DOTFILES_DIR"
-
-# --- 2. INSTALAÇÃO DE FERRAMENTAS MODERNAS (SEM HOMEBREW) ---
-echo -e "${BLUE}📦 Instalando/Verificando ferramentas (Binários Diretos)...${NC}"
-
+# Directories
 LOCAL_BIN="$HOME/.local/bin"
+ZSH_CUSTOM="$HOME/.oh-my-zsh/custom"
+FONTS_DIR="$HOME/.local/share/fonts"
+
+# Add local bin to path for this session
+export PATH="$LOCAL_BIN:$PATH"
 mkdir -p "$LOCAL_BIN"
 
-# Adiciona ao PATH do script atual para garantir que os comandos sejam encontrados
-if [[ ":$PATH:" != *":$LOCAL_BIN:"* ]]; then
-    export PATH="$LOCAL_BIN:$PATH"
-fi
+# --- HELPER FUNCTIONS ---
 
-# Função para instalar ferramentas baixando binários (bypass Homebrew)
-install_tool() {
+install_tool_binary() {
     local tool_name=$1
     local download_url=$2
-    local file_in_tar=$3
+    local binary_path_in_tar=$3 # Path inside tar, or filename if direct
     local strip_components=${4:-0}
 
     if ! command -v "$tool_name" &> /dev/null; then
-        echo "  -> Instalando ${tool_name}..."
+        echo -e "  -> Installing ${YELLOW}${tool_name}${NC}..."
         TEMP_DIR=$(mktemp -d)
-        wget -qO "$TEMP_DIR/tool.tar.gz" "$download_url"
-        
-        # Constrói os argumentos do tar dinamicamente
-        local tar_command="tar -xf $TEMP_DIR/tool.tar.gz -C $LOCAL_BIN"
-        if [ "$strip_components" -gt 0 ]; then
-            tar_command="$tar_command --strip-components=$strip_components"
+
+        # Check if URL ends with tar.gz
+        if [[ "$download_url" == *.tar.gz ]]; then
+            curl -sL "$download_url" | tar -xz -C "$TEMP_DIR"
+
+            # Find the binary in the temp dir
+            if [ "$strip_components" -gt 0 ]; then
+                # If stripped, it might be messy, try to find by name
+                find "$TEMP_DIR" -name "$(basename $binary_path_in_tar)" -type f -exec cp {} "$LOCAL_BIN/$tool_name" \;
+            else
+                # Direct path extraction attempt
+                if [ -f "$TEMP_DIR/$binary_path_in_tar" ]; then
+                     cp "$TEMP_DIR/$binary_path_in_tar" "$LOCAL_BIN/$tool_name"
+                else
+                     # Fallback search
+                     find "$TEMP_DIR" -name "$(basename $binary_path_in_tar)" -type f -exec cp {} "$LOCAL_BIN/$tool_name" \;
+                fi
+            fi
+        else
+            # Assume raw binary
+            curl -sL "$download_url" -o "$LOCAL_BIN/$tool_name"
         fi
-        if [ -n "$file_in_tar" ]; then
-            tar_command="$tar_command $file_in_tar"
-        fi
-        
-        eval "$tar_command"
-        rm -r "$TEMP_DIR"
-        echo -e "  ${GREEN}✅ ${tool_name} instalado.${NC}"
+
+        chmod +x "$LOCAL_BIN/$tool_name"
+        rm -rf "$TEMP_DIR"
+        echo -e "  ${GREEN}✅ ${tool_name} installed.${NC}"
     else
-        echo -e "  ${GREEN}✅ ${tool_name} já está instalado.${NC}"
+        echo -e "  ${GREEN}✅ ${tool_name} is already installed.${NC}"
     fi
 }
 
-# Instala Eza, Bat e Zoxide via binário direto
-install_tool "eza" "https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz" "eza"
-install_tool "bat" "https://github.com/sharkdp/bat/releases/download/v0.24.0/bat-v0.24.0-x86_64-unknown-linux-gnu.tar.gz" "bat-v0.24.0-x86_64-unknown-linux-gnu/bat" 1
-install_tool "zoxide" "https://github.com/ajeetdsouza/zoxide/releases/download/v0.9.4/zoxide-0.9.4-x86_64-unknown-linux-musl.tar.gz" "zoxide"
+backup_file() {
+    local file=$1
+    if [ -f "$file" ] || [ -L "$file" ]; then
+        echo -e "  -> Backing up existing $file to $file.bak"
+        mv "$file" "$file.bak"
+    fi
+}
 
-# Oh-my-posh (via script oficial)
-if ! command -v oh-my-posh &> /dev/null; then
-    echo "  -> Instalando oh-my-posh..."
-    curl -s https://ohmyposh.dev/install.sh | bash -s -- -d "$LOCAL_BIN"
-else
-    echo -e "  ${GREEN}✅ oh-my-posh já está instalado.${NC}"
-fi
+# --- 2. INSTALL LOCAL BINARIES (NO ROOT REQUIRED) ---
+echo -e "${BLUE}📦 Installing Tools (Binaries)...${NC}"
 
-# FZF (via git clone, método universal)
+# Eza (Modern ls)
+install_tool_binary "eza" \
+    "https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz" \
+    "eza"
+
+# Bat (Modern cat)
+install_tool_binary "bat" \
+    "https://github.com/sharkdp/bat/releases/download/v0.24.0/bat-v0.24.0-x86_64-unknown-linux-gnu.tar.gz" \
+    "bat"
+
+# Zoxide (Smarter cd)
+install_tool_binary "zoxide" \
+    "https://github.com/ajeetdsouza/zoxide/releases/latest/download/zoxide-x86_64-unknown-linux-musl.tar.gz" \
+    "zoxide"
+
+# FZF (Fuzzy Finder)
 if [ ! -d "$HOME/.fzf" ]; then
-    echo "  -> Instalando fzf..."
+    echo -e "  -> Installing ${YELLOW}fzf${NC}..."
     git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-    ~/.fzf/install --all --no-bash --no-fish
+    ~/.fzf/install --all --no-bash --no-fish --bin > /dev/null
+    # Symlink binary to local bin just in case
+    ln -sf "$HOME/.fzf/bin/fzf" "$LOCAL_BIN/fzf"
 else
-    echo -e "  ${GREEN}✅ fzf já está instalado.${NC}"
+    echo -e "  ${GREEN}✅ fzf is already installed.${NC}"
 fi
 
-# --- 3. NODE.JS & GEMINI (VIA NVM) ---
-echo -e "${BLUE}🤖 Configurando Node.js e IA...${NC}"
+# --- 3. OH MY ZSH & PLUGINS ---
+echo -e "${BLUE}⚡ Configuring Zsh Environment...${NC}"
 
-# 3.1 Instala NVM se não existir
+# Install Oh My Zsh
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+    echo -e "  -> Installing Oh My Zsh..."
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+else
+    echo -e "  ${GREEN}✅ Oh My Zsh already installed.${NC}"
+fi
+
+# Zsh Autosuggestions
+if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions" ]; then
+    echo "  -> Cloning zsh-autosuggestions..."
+    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+fi
+
+# Zsh Syntax Highlighting
+if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting" ]; then
+    echo "  -> Cloning zsh-syntax-highlighting..."
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+fi
+
+# Symlink .zshrc
+backup_file "$HOME/.zshrc"
+ln -sf "$REPO_DIR/.zshrc" "$HOME/.zshrc"
+echo -e "  ${GREEN}✅ .zshrc linked.${NC}"
+
+# --- 4. VIM CONFIGURATION ---
+echo -e "${BLUE}🎮 Configuring Vim...${NC}"
+
+# Install Vim-Plug
+if [ ! -f "$HOME/.vim/autoload/plug.vim" ]; then
+    echo "  -> Installing Vim-Plug..."
+    curl -fLo "$HOME/.vim/autoload/plug.vim" --create-dirs \
+        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+fi
+
+# Symlink .vimrc
+backup_file "$HOME/.vimrc"
+ln -sf "$REPO_DIR/.vimrc" "$HOME/.vimrc"
+echo -e "  ${GREEN}✅ .vimrc linked.${NC}"
+
+# Install Plugins (non-interactive)
+echo "  -> Installing Vim plugins (this might take a moment)..."
+vim -es -u "$HOME/.vimrc" -i NONE -c "PlugInstall" -c "qa"
+echo -e "  ${GREEN}✅ Vim plugins installed.${NC}"
+
+# --- 5. NODE.JS & AI TOOLS (NVM) ---
+echo -e "${BLUE}🤖 Configuring Node.js & AI...${NC}"
+
 export NVM_DIR="$HOME/.nvm"
-if [ ! -s "$NVM_DIR/nvm.sh" ]; then
-    echo "  -> Instalando NVM..."
+if [ ! -d "$NVM_DIR" ]; then
+    echo "  -> Installing NVM..."
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 fi
 
-# 3.2 Carrega o NVM para usar AGORA (Correção Importante)
-[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
+# Load NVM for this session
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-# 3.3 Instala Node LTS
-if ! nvm list | grep -q "lts"; then
-    echo "  -> Instalando Node.js LTS..."
-    nvm install --lts
-    nvm use --lts
-else
-    echo -e "  ${GREEN}✅ Node.js LTS já instalado.${NC}"
+if command -v nvm &> /dev/null; then
+    if ! nvm list | grep -q "lts"; then
+        echo "  -> Installing Node LTS..."
+        nvm install --lts
+    fi
     nvm use --lts > /dev/null
-fi
 
-# 3.4 Instala Gemini CLI (A solução "No-Homebrew")
-if ! command -v gemini &> /dev/null; then
-    echo "  -> Instalando Google Gemini CLI..."
-    npm install -g @google/gemini-cli
-    echo -e "  ${GREEN}✅ Gemini CLI instalado.${NC}"
+    # Install Gemini CLI
+    if ! npm list -g @google/gemini-cli > /dev/null 2>&1; then
+        echo "  -> Installing Google Gemini CLI..."
+        npm install -g @google/gemini-cli
+    else
+        echo -e "  ${GREEN}✅ Gemini CLI already installed.${NC}"
+    fi
+
+    # Create Wrapper Script for Gemini if it doesn't exist
+    # The .zshrc expects start_gemini.sh in local/bin
+    if [ ! -f "$LOCAL_BIN/start_gemini.sh" ]; then
+        echo "  -> Creating start_gemini.sh wrapper..."
+        cat << 'EOF' > "$LOCAL_BIN/start_gemini.sh"
+#!/bin/bash
+# Wrapper to ensure NVM is loaded before running gemini
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+# Check if user passed arguments
+if [ $# -eq 0 ]; then
+    gemini chat
 else
-    echo -e "  ${GREEN}✅ Gemini CLI já está instalado.${NC}"
+    gemini "$@"
 fi
-
-# --- 4. ZSH & ZINIT ---
-echo -e "${BLUE}⚡ Instalando Zinit (Gerenciador de Plugins)...${NC}"
-if [ ! -d "$HOME/.local/share/zinit/zinit.git" ]; then
-    mkdir -p "$HOME/.local/share/zinit"
-    git clone https://github.com/zdharma-continuum/zinit.git "$HOME/.local/share/zinit/zinit.git"
-else
-    echo -e "  ${GREEN}✅ Zinit já instalado.${NC}"
-fi
-
-# --- 5. FONTS (NERD FONT) ---
-FONT_DIR="$HOME/.local/share/fonts"
-mkdir -p "$FONT_DIR"
-if [ ! -f "$FONT_DIR/MesloLGS NF Regular.ttf" ]; then
-    echo -e "${BLUE}🅰️  Instalando fontes Meslo Nerd Font...${NC}"
-    curl -fLo "$FONT_DIR/MesloLGS NF Regular.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf
-    curl -fLo "$FONT_DIR/MesloLGS NF Bold.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf
-    curl -fLo "$FONT_DIR/MesloLGS NF Italic.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf
-    if command -v fc-cache >/dev/null 2>&1; then
-        echo -e "${BLUE}🔄 Atualizando cache de fontes...${NC}"
-        fc-cache -f "$FONT_DIR"
+EOF
+        chmod +x "$LOCAL_BIN/start_gemini.sh"
     fi
 else
-    echo -e "${GREEN}✅ Fontes já instaladas.${NC}"
+    echo -e "${RED}⚠️ Could not load NVM. Skipping Node.js setup.${NC}"
 fi
 
-# --- 6. SYMLINKING DOTFILES ---
-echo -e "${BLUE}🔗 Criando symlinks para os dotfiles...${NC}"
-ln -sf "$DOTFILES_DIR/vimrc" "$HOME/.vimrc"
-ln -sf "$DOTFILES_DIR/zshrc" "$HOME/.zshrc"
-echo -e "  ${GREEN}✅ Symlinks criados.${NC}"
+# --- 6. FONTS ---
+echo -e "${BLUE}🅰️  Installing Fonts...${NC}"
+mkdir -p "$FONTS_DIR"
+if [ ! -f "$FONTS_DIR/MesloLGS NF Regular.ttf" ]; then
+    curl -sL "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf" -o "$FONTS_DIR/MesloLGS NF Regular.ttf"
+    echo -e "  ${GREEN}✅ Meslo Nerd Font installed.${NC}"
+    if command -v fc-cache >/dev/null 2>&1; then
+        fc-cache -f "$FONTS_DIR"
+    fi
+else
+    echo -e "  ${GREEN}✅ Fonts already present.${NC}"
+fi
 
-# --- 7. CRIANDO SCRIPTS E GUIAS ---
-echo -e "${BLUE}📝 Atualizando guia e scripts...${NC}"
+# --- 7. DOCUMENTATION & FINALIZATION ---
+echo -e "${BLUE}📝 Generating Guide...${NC}"
+cp "$REPO_DIR/vim_cheatsheet.md" "$HOME/.vim_cheatsheet.md" 2>/dev/null || true
 
-# Guia Atualizado
 cat << 'EOF' > "$HOME/.guia.md"
-# 🚀 GUIA DE ATALHOS E FERRAMENTAS (CLÁUDIO)
-## 🧠 Zoxide (Navegação Inteligente)
-z <nome>      # Vai para uma pasta (ex: z push)
-z -           # Volta para a pasta anterior
+# 🚀 GUIA RÁPIDO DO AMBIENTE
 
-## 📂 Arquivos
-ls            # Lista com ícones (eza)
-cat <arq>     # Lê com cores (bat)
+## 📂 Navegação & Arquivos
+z <nome>       # Pular para pasta (ex: z desktop)
+ls             # Listar arquivos (com ícones)
+cat <arq>      # Ler arquivo (com syntax highlighting)
 
-## 🤖 Gemini (IA)
-gemini        # Abre o chat interativo (Login na 1ª vez)
-gemini "msg"  # Pergunta rápida
+## 🤖 IA (Gemini)
+gemini         # Iniciar chat
+gemini "msg"   # Pergunta rápida
 
-## ⌨️ Atalhos
-Ctrl + L      # Limpar tela
-Ctrl + R      # Histórico de comandos
+## ⌨️ Vim
+Ctrl+n         # Abrir árvore de arquivos
+:PlugInstall   # Instalar plugins (se faltar algo)
+
+## 🛠️ Manutenção
+update_dotfiles # (Se configurado) ou 'git pull' na pasta dotfiles
 EOF
 
-# Update Script
-cat << 'EOF' > "$DOTFILES_DIR/update.sh"
-#!/bin/bash
-set -e
-echo "Pulling latest changes from dotfiles repository..."
-git -C "$(dirname "$0")" pull
-echo "Re-running install script to apply updates..."
-bash "$(dirname "$0")/install.sh"
-echo "Update complete!"
-EOF
-chmod +x "$DOTFILES_DIR/update.sh"
-
-echo -e "${GREEN}✅ INSTALAÇÃO CONCLUÍDA!${NC}"
-echo -e "Reinicie o terminal ou digite: ${BLUE}source ~/.zshrc${NC}"
-echo -e "Para usar a IA pela primeira vez, digite: ${BLUE}gemini${NC}"
+echo -e "\n${GREEN}🎉 INSTALAÇÃO CONCLUÍDA!${NC}"
+echo -e "Por favor, reinicie seu terminal ou execute: ${BLUE}source ~/.zshrc${NC}"

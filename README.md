@@ -1,126 +1,102 @@
-# 🚀 Ultimate Terminal Setup (Dotfiles)
+# Claudio's Dotfiles 🚀
 
-![License](https://img.shields.io/github/license/claudio1code/dotfiles?style=flat-square)
-![Shell](https://img.shields.io/badge/Shell-Zsh-blue?style=flat-square&logo=zsh)
-![Environment](https://img.shields.io/badge/Environment-42%20SP%20%7C%20Linux%20%7C%20WSL-success?style=flat-square)
+Configuração de ambiente de desenvolvimento portátil, robusta e moderna. Projetada para oferecer uma experiência consistente tanto em **máquinas pessoais** (com acesso root/sudo) quanto em **ambientes restritos** (como a 42 School, laboratórios universitários e containers Docker), onde você não tem permissões de administrador.
 
-Configuração de terminal otimizada para estudantes da **42**, usuários de **Linux** e **WSL**.
+## ⚡ Principais Recursos
 
-Este setup transforma um terminal padrão num ambiente de desenvolvimento moderno, rápido e com **IA integrada**, projetado especificamente para funcionar sem permissões de administrador (`sudo`) e sem estourar cotas de disco.
+### Shell & Navegação
+- **Zsh + Oh My Zsh**: Configuração otimizada com plugins essenciais.
+- **Tema**: Tema `gnzh` limpo e funcional.
+- **Zoxide (`z`)**: Navegação inteligente. Nunca mais digite caminhos longos (ex: `z proj` leva você direto para `~/code/meu-projeto`).
+- **FZF**: Buscador "fuzzy" ultra-rápido para histórico e arquivos.
+
+### Ferramentas Modernas (Rust-based)
+Substitutos modernos para comandos clássicos, instalados localmente (`~/.local/bin`) sem precisar de `apt` ou `brew`:
+- **Eza** (substituto do `ls`): Listagem com ícones, cores e informações de git.
+- **Bat** (substituto do `cat`): Visualizador de arquivos com syntax highlighting.
+
+### Editor (Vim)
+- **Plugins Gerenciados**: Uso do `vim-plug` para instalação automática.
+- **IDE-like**: Árvore de arquivos (`NERDTree`), autocompletar, suporte a mouse e temas visuais (Dracula).
+- **Cheat Sheet**: Guia de atalhos integrado.
+
+### IA & Dev
+- **Node.js via NVM**: Gerenciamento de versões do Node sem sudo.
+- **Gemini CLI**: Inteligência Artificial do Google integrada ao terminal para dúvidas rápidas de código.
 
 ---
 
----
+## 📥 Instalação
 
-## ⚡ Instalação Rápida
+O processo é simples e idempotente (pode rodar várias vezes sem quebrar nada).
 
-Abra o seu terminal e rode este comando único. O script detectará o seu ambiente e instalará tudo localmente na sua pasta de usuário.
+### 1. Clonar e Instalar
+Abra seu terminal e execute:
 
 ```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/claudio1code/dotfiles/main/install.sh)"
+# Clone o repositório (pode ser em qualquer pasta)
+git clone https://github.com/claudio1code/dotfiles.git ~/dotfiles
+
+# Entre na pasta e execute o instalador
+cd ~/dotfiles
+bash install.sh
 ```
+
+### 2. O que o script faz?
+1. **Verifica Dependências**: Baixa binários portáteis se não estiverem instalados.
+2. **Configura Zsh**: Instala Oh My Zsh e plugins (`autosuggestions`, `syntax-highlighting`).
+3. **Configura Vim**: Linka o `.vimrc` e roda `:PlugInstall` automaticamente.
+4. **Configura Fontes**: Baixa e instala *Meslo Nerd Font* em `~/.local/share/fonts`.
+5. **Configura Node/IA**: Instala NVM e o pacote `gemini-cli`.
 
 ---
 
-## 🔄 Como Atualizar
+## 🛠️ Pós-Instalação
 
-Para atualizar sua configuração com as últimas mudanças do repositório:
+### 1. Reiniciar o Shell
+Para aplicar as mudanças imediatamente:
+```bash
+exec zsh
+```
+Ou feche e abra o terminal novamente.
+
+### 2. Configurar Fonte (Importante)
+Para ver os ícones corretamente (no prompt e no `ls`), configure seu emulador de terminal (iTerm2, Alacritty, GNOME Terminal, VSCode, Zed) para usar a fonte **MesloLGS NF**. O script já a instalou na sua pasta de fontes do usuário.
+
+### 3. Login no Gemini (Primeira vez)
+Se quiser usar a IA no terminal:
+```bash
+gemini login
+```
+Siga as instruções para autenticar com sua conta Google.
+
+---
+
+## 📖 Como Usar
+
+### Atalhos do Terminal
+| Comando | Ação |
+| :--- | :--- |
+| `z <nome>` | Pular para diretório (ex: `z dot` -> `~/dotfiles`) |
+| `ls` / `la` | Listar arquivos com ícones |
+| `cat <arq>` | Ler arquivo com cores |
+| `guia` | Abrir guia rápido de comandos |
+| `update_dotfiles` | Atualizar todo o ambiente |
+| `gemini "pergunta"` | Perguntar algo rápido para a IA |
+
+### Atalhos do Vim
+| Atalho | Ação |
+| :--- | :--- |
+| `Ctrl + n` | Abrir/Fechar árvore de arquivos lateral |
+| `:vsplit` | Dividir tela verticalmente |
+| `Ctrl + w` + setas | Navegar entre janelas divididas |
+
+---
+
+## 🔄 Atualização
+
+Para atualizar suas configurações, plugins e ferramentas para a versão mais recente deste repositório, basta rodar o comando (alias) de qualquer lugar:
 
 ```bash
-bash ~/dotfiles/update.sh
+update_dotfiles
 ```
-
----
-
-## O que está incluso?
-
-Este setup irá clonar o repositório para `~/.dotfiles` e configurar as seguintes ferramentas:
-
-- **Homebrew:** Gerenciador de pacotes para macOS e Linux.
-- **Ferramentas Modernas:** `eza`, `bat`, `zoxide`, `fzf`, `oh-my-posh`.
-- **Ambiente Node.js:** Instala `nvm` e a CLI do Gemini.
-- **Fontes:** Baixa e instala a `Meslo Nerd Font` para ícones no terminal.
-- **Zsh com Zinit:** Um ambiente de shell rápido com autocompletar e syntax highlighting.
-- **Configuração do Vim:** Transforma o Vim em um editor de código mais amigável e poderoso com plugins essenciais.
-- **Guia de Atalhos:** Um guia rápido (`guia`) com os principais atalhos e comandos.
-
-## ⚙️ Configuração do Vim
-
-Se você quer apenas a configuração do Vim, sem o resto do ambiente, pode usar este comando:
-
-```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/claudio1code/dotfiles/main/install_vim.sh)"
-```
-
-### Pós-Instalação (Configuração Inicial)
-
-Após a instalação terminar, siga estes 3 passos rápidos:
-
-**1. Carregue o novo terminal:**
-```bash
-source ~/.zshrc
-```
-
-**2. Ative a IA (Login):** Na primeira vez que usar, o Gemini precisa conectar na sua conta Google. Rode o comando abaixo e siga as instruções no navegador:
-```bash
-gemini
-```
-
-**3. Instale os Plugins do Vim:** Abra o Vim e digite o comando de instalação:
-```vim
-:PlugInstall
-```
-
----
-
-## ✨ Principais Funcionalidades
-
-### 🤖 Inteligência Artificial Nativa (Gemini CLI)
-O terminal vem equipado com a CLI oficial do Google Gemini (`@google/gemini-cli`).
-- **Chat Interativo:** Discuta código, lógica e arquitetura sem sair do terminal.
-- **Agente de Arquivos:** A IA pode ler, analisar e (se solicitado) editar os seus ficheiros.
-- **Comando:** `gemini`
-
-### ⚡ Navegação & Ferramentas Modernas
-Substituímos os comandos antigos por versões modernas e rápidas:
-- **`z` (Zoxide):** Um `cd` inteligente. Pule para pastas profundas digitando apenas parte do nome (ex: `z push`).
-- **`ls` (Eza):** Listagem de ficheiros com ícones, cores e indicadores de Git.
-- **`cat` (Bat):** Visualizador de ficheiros com syntax highlighting e numeração de linhas.
-- **`ctrl+r` (FZF):** Busca fuzzy no histórico de comandos.
-- **`ctrl+t` (FZF):** Busca fuzzy de ficheiros instantânea.
-
-### 🎨 Visual & Shell
-- **Oh My Posh:** Tema `kushal` configurado para mostrar status do Git, versão do Node/C/Go e tempo de execução.
-- **Zinit:** Gerenciador de plugins ultra-rápido.
-- **Fontes:** Instalação automática da *Meslo Nerd Font* para suporte a ícones.
-
-### 🛠️ Editor (Vim "Turbinado")
-O Vim já vem configurado como uma IDE leve:
-- **Plugins:** NERDTree, Airline, Dracula Theme, MuComplete.
-- **Atalhos:** `Ctrl+n` para abrir a árvore de ficheiros.
-
----
-
-## 📂 Estrutura do Projeto
-
-- **`install.sh`:** O cérebro da operação. Instala binários (Eza, Bat, Zoxide) em `~/.local/bin`, configura NVM/Node e a CLI do Gemini. Não usa Homebrew (para evitar problemas de dependência na 42).
-- **`.zshrc`:** Configuração do Shell, aliases, carregamento do NVM e plugins Zinit.
-- **`.vimrc`:** Configuração do editor e lista de plugins.
-- **`.poshthemes/`:** Temas do Oh My Posh.
-- **`guia.md`:** Um "cheat sheet" rápido instalado na sua home. Acesse digitando `guia`.
-
----
-
-## ⚠️ Compatibilidade
-
-Este kit foi desenhado especificamente para:
-
-- **42 School (Goinfre/Home):** Instala tudo em modo utilizador (user space), respeitando cotas e sem exigir root.
-- **Linux (Ubuntu/Debian/Arch):** Funciona em qualquer distro x86_64.
-- **WSL (Windows Subsystem for Linux):** Funciona perfeitamente.
-
-**Nota:** Atualmente o script baixa binários pré-compilados para Linux. Para usar em macOS, é necessário adaptar a função de download.
-
-## 📜 Licença
-
-MIT License © 2025 Claudio
