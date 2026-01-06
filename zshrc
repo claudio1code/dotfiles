@@ -36,7 +36,7 @@ zstyle ':vcs_info:git*' formats '%F{#bd93f9}%b%f%F{#50fa7b}%u%f%F{#8be9fd}%a%
 precmd() { vcs_info }
 
 # Prompt (Com quebra de linha)
-PS1=$'%B%F{#ff79c6}╭─%F{#50fa7b}%n@%m %F{#bd93f9}%2~%F{#ff79c6}]%f%b ${vcs_info_msg_0_}%B%(?..[%F{#ff5555}%?%f])%b\n%F{#50fa7b}╰─➤%f '
+PS1=$'%B%F{#50fa7b}╭─%n@%m %F{#ff5555}[%F{#bd93f9}%2~%F{#ff5555}]%f%b ${vcs_info_msg_0_}%B%(?..[%F{#ff5555}%?%f])%b\n%F{#50fa7b}╰─➤%f '
 export RPROMPT='%F{#8be9fd}%*%f'
 
 # --- HISTÓRICO ---
