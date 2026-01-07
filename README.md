@@ -21,12 +21,27 @@ O Homebrew é essencial para instalar várias ferramentas modernas sem precisar 
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
-
 Depois da instalação, adicione o Homebrew ao seu PATH (o instalador vai te mostrar os comandos). Geralmente é algo como:
 ```bash
 echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.bashrc
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 ```
+___________________________________________________________________________________
+
+### Caso peça permissão sudo baixe só na home.
+
+```bash
+git clone https://github.com/Homebrew/brew ~/.brew
+```
+
+Execute.
+```bash
+echo 'export PATH="$HOME/.brew/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+____________________________________________________________________________________
+
 
 **Verificar se funcionou:**
 ```bash
