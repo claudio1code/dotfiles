@@ -77,6 +77,7 @@ export AIDER_MODEL="gemini/gemini-2.0-flash-001"
 alias gpro='mods --api google --model gemini-2.0-flash-001 --no-cache'
 alias gflash='mods --api google --model gemini-1.5-flash-latest --no-cache'
 alias gemini-ui='mods --api google --model gemini-2.0-flash-001 --no-cache'
+alias gemini='gemini-ui'
 
 # Função gcommit (Commits Automáticos)
 gcommit() {
