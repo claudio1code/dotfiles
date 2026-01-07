@@ -57,5 +57,22 @@ curl -fLo "$HOME/.vim/autoload/plug.vim" --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim 2>/dev/null
 vim -es -u "$HOME/.vimrc" -i NONE -c "PlugInstall" -c "qa"
 
+# 6. Instalação de Fontes (MesloLGS NF)
+echo -e "${BLUE}--- Baixando Fontes (MesloLGS NF) ---${NC}"
+FONT_DIR="$HOME/.local/share/fonts"
+mkdir -p "$FONT_DIR"
+
+# Baixa as 4 variações da fonte
+curl -sL -o "$FONT_DIR/MesloLGS NF Regular.ttf" "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf"
+curl -sL -o "$FONT_DIR/MesloLGS NF Bold.ttf" "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf"
+curl -sL -o "$FONT_DIR/MesloLGS NF Italic.ttf" "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf"
+curl -sL -o "$FONT_DIR/MesloLGS NF Bold Italic.ttf" "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf"
+
+# Atualiza cache de fontes (se o comando existir)
+if command -v fc-cache &> /dev/null; then
+    echo "🔄 Atualizando cache de fontes..."
+    fc-cache -f "$FONT_DIR"
+fi
+
 echo -e "\n${GREEN}🎉 Instalação Concluída!${NC}"
 echo -e "Como seu .zshrc agora é inteligente, basta rodar: ${BLUE}zsh${NC}"
