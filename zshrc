@@ -1,3 +1,16 @@
+# --- CONFIGURAÇÃO INTELIGENTE DO HOMEBREW ---
+# Verifica se existe instalação local (42/Sem Root)
+if [ -d "$HOME/.brew/bin" ]; then
+    export PATH="$HOME/.brew/bin:$PATH"
+    eval "$($HOME/.brew/bin/brew shellenv)"
+# Verifica instalação padrão do Linux
+elif [ -d "/home/linuxbrew/.linuxbrew/bin" ]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+# Verifica macOS (Apple Silicon)
+elif [ -d "/opt/homebrew/bin" ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
 # --- CONFIGURAÇÃO BÁSICA ---
 export PATH="$HOME/.local/bin:$HOME/.local/bin/scripts:$PATH"
 
