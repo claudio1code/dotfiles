@@ -11,44 +11,9 @@ Funciona perfeitamente em:
 
 ## 📋 Pré-requisitos
 
-Antes de instalar os dotfiles, você precisa ter algumas ferramentas instaladas no seu sistema.
+Certifique-se de ter o básico instalado (`git`, `curl` e `make`), que geralmente já vêm no sistema.
 
-### 1️⃣ Homebrew/Linuxbrew (Gerenciador de Pacotes)
-
-O Homebrew é essencial para instalar várias ferramentas modernas sem precisar de `sudo`.
-
-**Instalação:**
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-Depois da instalação, adicione o Homebrew ao seu PATH (o instalador vai te mostrar os comandos). Geralmente é algo como:
-```bash
-echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.bashrc
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-```
-___________________________________________________________________________________
-
-### Caso peça permissão sudo baixe só na home.
-
-```bash
-git clone https://github.com/Homebrew/brew ~/.brew
-```
-
-Execute.
-```bash
-echo 'export PATH="$HOME/.brew/bin:$PATH"' >> ~/.zshrc
-source ~/.zshrc
-```
-
-____________________________________________________________________________________
-
-
-**Verificar se funcionou:**
-```bash
-brew --version
-```
-
-### 2️⃣ Python e Pip
+### 1️⃣ Python Pip
 
 A maioria das distribuições Linux já vem com Python. Verifique:
 ```bash
@@ -65,7 +30,7 @@ sudo apt update && sudo apt install python3 python3-pip
 sudo pacman -S python python-pip
 ```
 
-### 3️⃣ Go (Opcional, mas recomendado)
+### 2️⃣ Go (Opcional, mas recomendado)
 
 Algumas ferramentas de IA podem usar Go. Instale via Homebrew:
 ```bash
