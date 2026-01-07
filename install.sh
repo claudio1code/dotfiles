@@ -42,7 +42,7 @@ fi
 # 4. Links Simbólicos (Aqui está o pulo do gato!)
 echo -e "🔗 Criando symlinks..."
 # Ao linkar o zshrc novo, a configuração inteligente já vai junto
-ln -sf "$REPO_DIR/.zshrc" "$HOME/.zshrc" 
+ln -sf "$REPO_DIR/zshrc" "$HOME/.zshrc"
 ln -sf "$REPO_DIR/.vimrc" "$HOME/.vimrc"
 ln -sf "$REPO_DIR/vim_cheatsheet.md" "$HOME/.vim_cheatsheet.md"
 
