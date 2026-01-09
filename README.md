@@ -1,4 +1,4 @@
-# 🚀 Claudio's Dotfiles
+# Claudio's Dotfiles
 
 Bem-vindo ao meu setup de terminal! Este kit transforma um terminal Linux padrão (bash) em um ambiente de desenvolvimento moderno, bonito e produtivo, com **Zsh**, **Vim turbinado** e **IA integrada**.
 
@@ -252,7 +252,7 @@ Este setup instala e configura as seguintes ferramentas:
 
 ---
 
-## 🐛 Troubleshooting
+## 🔎 Troubleshooting
 
 ### Os ícones não aparecem
 - Certifique-se de que configurou a fonte `MesloLGS NF` no seu terminal
