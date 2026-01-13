@@ -1,0 +1,50 @@
+REPO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+ZINIT_HOME="$HOME/.local/share/zinit/zinit.git"
+
+mkdir -p "$(dirname "$ZINIT_HOME")"
+    git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+
+cho -e "${BLUE}--- Baixando Fontes (MesloLGS NF) ---${NC}"
+FONT_DIR="$HOME/.local/share/fonts"
+mkdir -p "$FONT_DIR"
+
+# Baixa as 4 variações da fonte
+curl -sL -o "$FONT_DIR/MesloLGS NF Regular.ttf" "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf"
+curl -sL -o "$FONT_DIR/MesloLGS NF Bold.ttf" "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf"
+curl -sL -o "$FONT_DIR/MesloLGS NF Italic.ttf" "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf"
+curl -sL -o "$FONT_DIR/MesloLGS NF Bold Italic.ttf" "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf"
+fc-cache -f "$FONT_DIR"
+echo -e "  ✅ Fontes MesloLGS NF instaladas."
+
+zsh
+
+# --- CONFIGURAÇÃO BÁSICA ---
+export PATH="$HOME/.local/bin:$HOME/.local/bin/scripts:$PATH"
+
+# ZINIT (Gerenciador de Plugins)
+source ~/.local/share/zinit/zinit.git/zinit.zsh
+zinit light zsh-users/zsh-autosuggestions
+zinit light zsh-users/zsh-syntax-highlighting
+
+alias ç='clear'
+alias norm='norminette'
+
+# --- ESTILO DO PROMPT (Dracula + Git) ---
+autoload -U colors && colors
+autoload -Uz vcs_info
+setopt prompt_subst
+
+# Configuração do Git
+zstyle ':vcs_info:*' enable git
+zstyle ':vcs_info:git*' formats '%F{#bd93f9}%b%f%F{#50fa7b}%u%f%F{#8be9fd}%a%f%F{#ff5555}%m%f'
+precmd() { vcs_info }
+
+# Prompt (Com quebra de linha)
+PS1=$'%B%F{#50fa7b}╭─%n@%m %F{#ff5555}[%F{#bd93f9}%2~%F{#ff5555}]%f%b ${vcs_info_msg_0_}%B%(?..[%F{#ff5555}%?%f])%b\n%F{#50fa7b}╰─➤%f '
+export RPROMPT='%F{#8be9fd}%*%f'
+
+# --- HISTÓRICO ---
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt appendhistory sharehistory hist_ignore_dups hist_ignore_space

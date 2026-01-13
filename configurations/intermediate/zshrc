@@ -1,0 +1,75 @@
+# --- CONFIGURAÇÃO INTERMEDIÁRIA ---
+# (Baseada na Simples + Ferramentas Modernas)
+
+export PATH="$HOME/.local/bin:$HOME/.local/bin/scripts:$PATH"
+
+# --- ZINIT & PLUGINS ---
+ZINIT_PATH="$HOME/.local/share/zinit/zinit.git/zinit.zsh"
+if [ -f "$ZINIT_PATH" ]; then
+    source "$ZINIT_PATH"
+    zinit light zsh-users/zsh-autosuggestions
+    zinit light zsh-users/zsh-syntax-highlighting
+fi
+
+# --- FERRAMENTAS MODERNAS (Se instaladas) ---
+
+# Zoxide (Substituto do CD)
+if command -v zoxide &> /dev/null; then
+    eval "$(zoxide init zsh)"
+    alias cd="z"
+fi
+
+# FZF (Busca Fuzzy)
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# Eza (Substituto do LS)
+if command -v eza &> /dev/null; then
+    alias ls='eza --icons'
+    alias ll='eza -l --icons'
+    alias la='eza -la --icons'
+    alias tree='eza --tree --icons'
+else
+    alias ll='ls -l --color=auto'
+    alias la='ls -la --color=auto'
+fi
+
+# Bat (Substituto do CAT)
+if command -v bat &> /dev/null; then
+    alias cat='bat --paging=never'
+    alias preview='bat --style=numbers --color=always'
+elif command -v batcat &> /dev/null; then
+    alias cat='batcat --paging=never'
+fi
+
+# --- ALIASES GERAIS ---
+alias ç='clear'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias norm='norminette'
+alias gs='git status'
+alias ga='git add'
+alias gc='git commit -m'
+alias gp='git push'
+
+# --- PROMPT (Dracula + Git) ---
+autoload -U colors && colors
+autoload -Uz vcs_info
+setopt prompt_subst
+
+zstyle ':vcs_info:*' enable git
+zstyle ':vcs_info:git*' formats '%F{#bd93f9}%b%f%F{#50fa7b}%u%f%F{#8be9fd}%a%f%F{#ff5555}%m%f'
+precmd() { vcs_info }
+
+PS1='$'%B%F{#50fa7b}╭─%n@%m %F{#ff5555}[%F{#bd93f9}%2~%F{#ff5555}]%f%b ${vcs_info_msg_0_}%B%(?..[%F{#ff5555}%?%f])%b\n%F{#50fa7b}╰─➤%f '
+export RPROMPT='%F{#8be9fd}%*%f'
+
+# --- HISTÓRICO ---
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt appendhistory sharehistory hist_ignore_dups hist_ignore_space
+
+# --- CONFIGURAÇÕES LOCAIS (Seus Aliases Pessoais) ---
+if [ -f "$HOME/.zshrc_local" ]; then
+    source "$HOME/.zshrc_local"
+fi

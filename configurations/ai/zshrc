@@ -1,0 +1,114 @@
+# --- CONFIGURAÇÃO COMPLETE AI (Intermediária + IA) ---
+
+export PATH="$HOME/.local/bin:$HOME/.local/bin/scripts:$PATH"
+
+# --- ZINIT & PLUGINS ---
+ZINIT_PATH="$HOME/.local/share/zinit/zinit.git/zinit.zsh"
+if [ -f "$ZINIT_PATH" ]; then
+    source "$ZINIT_PATH"
+    zinit light zsh-users/zsh-autosuggestions
+    zinit light zsh-users/zsh-syntax-highlighting
+fi
+
+# --- NVM (Node Version Manager) ---
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# --- FERRAMENTAS MODERNAS ---
+if command -v zoxide &> /dev/null; then
+    eval "$(zoxide init zsh)"
+    alias cd="z"
+fi
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+if command -v eza &> /dev/null; then
+    alias ls='eza --icons'
+    alias ll='eza -l --icons'
+    alias la='eza -la --icons'
+else
+    alias ll='ls -l --color=auto'
+    alias la='ls -la --color=auto'
+fi
+
+if command -v bat &> /dev/null; then
+    alias cat='bat --paging=never'
+fi
+
+# --- IA & GEMINI ---
+
+# Wrapper para garantir que o Node esteja carregado ao chamar o gemini
+gemini() {
+  # Se o comando gemini não estiver no path, tenta carregar via NVM
+  if ! command -v gemini &> /dev/null; then
+      if command -v nvm &> /dev/null; then
+          nvm use default >/dev/null 2>&1
+      fi
+  fi
+  command gemini "$@"
+}
+
+# gcommit: Commit Automático com IA
+gcommit() {
+    if git diff --cached --quiet; then
+        echo "⚠️  Nada estagiado para commit."
+        return 1
+    fi
+
+    echo "🤖 Lendo alterações..."
+    DIFF_CONTENT="$(git diff --cached)"
+
+    # Prompt Otimizado
+    PROMPT="Você é um gerador de mensagens de commit (Conventional Commits).
+    Seja conciso. Use português.
+    Retorne APENAS a mensagem.
+    
+    Diff:
+    $DIFF_CONTENT"
+
+    echo "🤖 Gerando sugestão com Gemini..."
+    # Assume que 'gemini' aceita input via pipe ou argumento. Ajuste conforme sua CLI.
+    # Exemplo usando pipe para a CLI padrão:
+    SUGESTAO="$(echo "$PROMPT" | gemini)"
+
+    if [ -z "$SUGESTAO" ]; then
+        echo "❌ Falha ao gerar mensagem (Verifique sua API KEY ou Internet)"
+        return 1
+    fi
+
+    echo -e "\n📝 Sugestão:\n$SUGESTAO\n"
+    echo -n "Usar essa mensagem? [Y/n] "
+    read resp
+    if [[ "$resp" =~ ^[Nn]$ ]]; then
+        echo "Cancelado."
+    else
+        git commit -m "$SUGESTAO"
+    fi
+}
+
+# --- ALIASES GERAIS ---
+alias ç='clear'
+alias ..='cd ..'
+alias norm='norminette'
+alias gs='git status'
+
+# --- PROMPT (Dracula + Git) ---
+autoload -U colors && colors
+autoload -Uz vcs_info
+setopt prompt_subst
+
+zstyle ':vcs_info:*' enable git
+zstyle ':vcs_info:git*' formats '%F{#bd93f9}%b%f%F{#50fa7b}%u%f%F{#8be9fd}%a%f%F{#ff5555}%m%f'
+precmd() { vcs_info }
+
+PS1=$'%B%F{#50fa7b}╭─%n@%m %F{#ff5555}[%F{#bd93f9}%2~%F{#ff5555}]%f%b ${vcs_info_msg_0_}%B%(?..[%F{#ff5555}%?%f])%b\n%F{#50fa7b}╰─➤%f '
+export RPROMPT='%F{#8be9fd}%*%f'
+
+# --- CONFIGURAÇÕES LOCAIS (Preservação) ---
+if [ -f "$HOME/.zshrc_local" ]; then
+    source "$HOME/.zshrc_local"
+fi
+
+# Carrega API KEY se existir
+[ -f "$HOME/.env" ] && source "$HOME/.env"

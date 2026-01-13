@@ -14,6 +14,11 @@ fi
 # --- CONFIGURAÇÃO BÁSICA ---
 export PATH="$HOME/.local/bin:$HOME/.local/bin/scripts:$PATH"
 
+# NVM (Node)
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
+
 # ZINIT (Gerenciador de Plugins)
 source ~/.local/share/zinit/zinit.git/zinit.zsh
 zinit light zsh-users/zsh-autosuggestions
@@ -62,42 +67,66 @@ setopt appendhistory sharehistory hist_ignore_dups hist_ignore_space
 # FZF
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# NVM (Node)
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
+# --- INTELIGÊNCIA ARTIFICIAL (Gemini CLI Oficial) ---
 
-# --- INTELIGÊNCIA ARTIFICIAL ---
-# Carrega segredos (Crie um arquivo .env para colocar suas chaves!)
+# Carrega variáveis sensíveis (API KEY)
 [ -f ~/.env ] && source ~/.env
+# --- Gemini CLI (robusto para 42 / NVM) ---
+unalias gemini 2>/dev/null
 
-export AIDER_MODEL="gemini/gemini-2.0-flash-001"
+gemini() {
+  nvm use 20 >/dev/null 2>&1
 
-# Aliases Mods
-alias gpro='mods --api google --model gemini-2.0-flash-001 --no-cache'
-alias gflash='mods --api google --model gemini-1.5-flash-latest --no-cache'
-alias gemini-ui='mods --api google --model gemini-2.0-flash-001 --no-cache'
+  # garante que o binário do node ativo está no PATH
+  export PATH="$NVM_BIN:$PATH"
 
-# Função gcommit (Commits Automáticos)
+  command gemini "$@"
+}
+
+
+# --- gcommit: Commits Automáticos com Gemini ---
 gcommit() {
+    # Verifica se há algo estagiado
     if git diff --cached --quiet; then
         echo "⚠️  Nada estagiado para commit."
         return 1
     fi
+
     echo "🤖 Lendo alterações..."
-    DIFF_CONTENT=$(git diff --cached)
-    PROMPT="INSTRUÇÃO: Aja apenas como um formatador de texto.
-    TAREFA: Escreva uma mensagem de commit (Conventional Commits) baseada APENAS no texto abaixo.
-    REGRAS: Retorne APENAS a string da mensagem final.
-    TEXTO DE ENTRADA (DIFF): $DIFF_CONTENT"
-    
-    echo "🤖 Gerando sugestão..."
-    SUGESTAO=$(gemini-ui "$PROMPT")
-    
-    echo -e "\n----------------------------------------"
-    echo -e "Sugestão: \033[1;32m$SUGESTAO\033[0m"
-    echo -e "----------------------------------------\n"
-    
+    DIFF_CONTENT="$(git diff --cached)"
+
+    PROMPT=$(cat <<'EOF'
+Você é um gerador de mensagens de commit.
+
+Regras:
+- Use o padrão Conventional Commits
+- Seja claro e conciso
+- Retorne APENAS a mensagem final
+- Não use markdown
+- Não explique nada
+- Commita só em português
+
+Diff:
+EOF
+)
+    PROMPT="$PROMPT
+$DIFF_CONTENT"
+
+    echo "🤖 Gerando sugestão com Gemini..."
+    SUGESTAO="$(printf "%s" "$PROMPT" | gemini)"
+
+    if [ -z "$SUGESTAO" ]; then
+        echo "❌ Falha ao gerar mensagem"
+        return 1
+    fi
+
+    echo
+    echo "Sugestão:"
+    echo "----------------------------------------"
+    echo "$SUGESTAO"
+    echo "----------------------------------------"
+    echo
+
     echo -n "Usar essa mensagem? [y/N] "
     read resp
     if [[ "$resp" =~ ^[Yy]$ ]]; then
@@ -106,7 +135,3 @@ gcommit() {
         echo "Cancelado."
     fi
 }
-
-# Keybindings (Ctrl+Setas)
-bindkey '^[[1;5D' backward-word
-bindkey '^[[1;5C' forward-word

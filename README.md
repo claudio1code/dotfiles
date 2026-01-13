@@ -1,279 +1,77 @@
-# 🚀 Claudio's Dotfiles
+# 🚀 Dotfiles Modulares & Inteligentes
 
-Bem-vindo ao meu setup de terminal! Este kit transforma um terminal Linux padrão (bash) em um ambiente de desenvolvimento moderno, bonito e produtivo, com **Zsh**, **Vim turbinado** e **IA integrada**.
-
-Funciona perfeitamente em:
-- **42 School** (Ambientes sem permissão de root)
-- **Linux** (Ubuntu, Debian, Arch, etc.)
-- **WSL** (Windows Subsystem for Linux)
+> Configuração de terminal otimizada, modular e pronta para IA. Projetada para ser leve, compatível com a **42 School** (ambientes sem root/sudo) e altamente produtiva.
 
 ---
 
-## 📋 Pré-requisitos
+## 🎯 Qual versão escolher?
 
-Certifique-se de ter o básico instalado (`git`, `curl` e `make`), que geralmente já vêm no sistema.
+O instalador interativo permite escolher entre três níveis de personalização. Veja qual se adapta melhor ao seu momento:
 
-### 1️⃣ Python Pip
+| Nível | Perfil de Uso | O que inclui? | Espaço |
+| :--- | :--- | :--- | :--- |
+| **1. Simples** | **Servidores / Minimalista**<br>Apenas o essencial para um terminal bonito. | • Prompt Dracula + Git<br>• Syntax Highlighting<br>• Autosuggestions | ~2MB |
+| **2. Intermediária** | **Dev Moderno (Sem Root)**<br>Ferramentas Rust poderosas sem precisar de `sudo`. | • Tudo da Simples<br>• `zoxide` (cd inteligente)<br>• `eza` (ls melhorado)<br>• `bat` (cat com cores)<br>• `fzf` (histórico fuzzy) | ~50MB |
+| **3. AI / Complete** | **Power User + IA**<br>Automação total com Gemini e Node.js. | • Tudo da Intermediária<br>• **Gemini CLI** (Chat no terminal)<br>• **Auto-Commit** (Mensagens via IA)<br>• **NVM** (Node Version Manager) | ~200MB+ |
 
-A maioria das distribuições Linux já vem com Python. Verifique:
+---
+
+## 📦 Instalação
+
+Basta clonar e rodar o script. Um menu interativo guiará você.
+
 ```bash
-python3 --version
-pip3 --version
-```
-
-Se não tiver, instale:
-```bash
-# Ubuntu/Debian
-sudo apt update && sudo apt install python3 python3-pip
-
-# Arch
-sudo pacman -S python python-pip
-```
-
-### 2️⃣ Go (Opcional, mas recomendado)
-
-Algumas ferramentas de IA podem usar Go. Instale via Homebrew:
-```bash
-brew install go
+git clone https://github.com/SEU_USUARIO/dotfiles.git
+cd dotfiles
+./install.sh
 ```
 
 ---
 
-## 📥 Instalação
+## ✨ Detalhes das Funcionalidades
 
-Abra seu terminal e rode os comandos abaixo, um por um:
+### 🧠 Inteligência Artificial (Apenas v3)
 
-### Passo 1: Clone o Repositório
-```bash
-git clone https://github.com/claudio1code/dotfiles.git ~/dotfiles
-```
+Na versão **AI / Complete**, você ganha superpoderes:
 
-### Passo 2: Instale o Zinit (Gerenciador de Plugins do Zsh)
+*   **`gcommit`**: Cansado de escrever mensagens de commit?
+    1.  Dê `git add .`
+    2.  Digite `gcommit`
+    3.  A IA lê suas mudanças e gera uma mensagem no padrão *Conventional Commits*.
 
-O Zinit gerencia os plugins do Zsh (autocomplete, syntax highlighting, etc.).
+*   **`gemini "pergunta"`**: Tire dúvidas de código sem sair do terminal.
 
-```bash
-mkdir -p ~/.local/share/zinit
-git clone https://github.com/zdharma-continuum/zinit.git ~/.local/share/zinit/zinit.git
-```
+> **Nota:** Requer uma API Key do Google. Crie um arquivo `~/.env`:
+> ```bash
+> export GEMINI_API_KEY="sua_chave_aqui"
+> ```
 
-### Passo 3: Instale as Ferramentas de IA
+### 🛡️ Modo Seguro (Preservação)
 
-Estas são as ferramentas que trazem inteligência artificial para o seu terminal:
-
-#### 🤖 Mods (Interface CLI para Gemini)
-```bash
-brew install mods
-```
-
-O `mods` é usado pelos comandos `gpro`, `gflash` e `gemini-ui` no terminal.
-
-#### 🧑‍💻 Aider (Pair Programming com IA)
-```bash
-pip3 install aider-chat
-```
-
-O Aider permite que você faça pair programming com a IA diretamente no terminal.
-
-### Passo 4: Execute o Instalador Principal
-
-Agora rode o script de instalação que vai configurar tudo automaticamente:
-```bash
-cd ~/dotfiles
-bash install.sh
-```
-
-> **O que o instalador faz?**
-> - Baixa ferramentas modernas (`eza`, `bat`, `zoxide`) para sua pasta local
-> - Configura o Zsh como seu shell padrão
-> - Instala plugins do Zinit
-> - Configura o Vim/Neovim
-> - Instala a fonte MesloLGS NF com ícones
-> - Copia os arquivos de configuração (`.zshrc`, `.vimrc`)
+**Nós respeitamos seu setup atual.**
+Ao instalar, o script **NÃO apaga** seu `.zshrc` antigo.
+1.  Ele renomeia seu arquivo atual para `~/.zshrc_local`.
+2.  O novo configuração carrega esse arquivo automaticamente.
+3.  **Resultado:** Seus aliases e funções antigas continuam funcionando magicamente!
 
 ---
 
-## 🎨 Passo Crítico: Configurando a Fonte
+## 🔧 Ferramentas Inclusas (v2 e v3)
 
-**LEIA COM ATENÇÃO:** Para que os ícones (pastinhas, setas, git branches) apareçam corretamente e não fiquem como quadrados (□), você precisa configurar o seu terminal para usar a fonte **MesloLGS NF**.
+Estas ferramentas são instaladas localmente em `~/.local/bin` (não precisa de `brew` nem `sudo`):
 
-O script já instalou essa fonte no seu sistema Linux (`~/.local/share/fonts`). Agora você precisa dizer ao seu emulador de terminal para usá-la.
-
-### 🖥️ No VS Code
-1. Abra as configurações (`Ctrl + ,`)
-2. Digite na busca: `terminal font`
-3. Em **Terminal > Integrated: Font Family**, coloque exatamente:
-   ```text
-   'MesloLGS NF'
-   ```
-   *(Mantenha as aspas simples)*
-
-### 🪟 No Windows Terminal (WSL)
-Se você usa WSL, você precisa instalar a fonte **no Windows**, não só no Linux.
-1. Baixe os arquivos `.ttf` [neste link](https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf)
-2. Clique duas vezes no arquivo baixado e clique em **Instalar**
-3. No Windows Terminal:
-   - Vá em **Configurações** → Selecione seu perfil (Ubuntu/Debian) → **Aparência**
-   - Em **Tipo de fonte**, selecione `MesloLGS NF`
-
-### 🐧 No Linux (Gnome Terminal / Terminator)
-1. Clique com botão direito no terminal → **Preferências**
-2. Vá na aba do seu perfil (geralmente "Sem nome" ou "Padrão")
-3. Marque a caixa **Fonte personalizada**
-4. Procure e selecione `MesloLGS NF Regular`
+- **[Zoxide](https://github.com/ajeetdsouza/zoxide):** O comando `cd` que aprende. Digite `z pasta` e ele te leva lá.
+- **[Eza](https://github.com/eza-community/eza):** Um `ls` moderno com ícones e cores.
+- **[Bat](https://github.com/sharkdp/bat):** Um `cat` com syntax highlighting e paginação.
+- **[FZF](https://github.com/junegunn/fzf):** Aperte `Ctrl+R` e encontre qualquer comando do passado instantaneamente.
 
 ---
 
-## ⚙️ Configuração da IA
+## 🗑️ Desinstalação / Limpeza
 
-Para usar as ferramentas de inteligência artificial, você precisa configurar as credenciais:
-
-### 🔑 Configurar Google API Key (Gemini)
-
-1. **Obtenha sua chave de API:**
-   - Acesse [Google AI Studio](https://makersuite.google.com/app/apikey)
-   - Crie uma chave de API gratuita
-
-2. **Configure o Mods na primeira vez:**
-   ```bash
-   mods --settings
-   ```
-   Siga as instruções para adicionar sua API key do Google.
-
-3. **Teste se funcionou:**
-   ```bash
-   gemini-ui "Olá! Como você está?"
-   ```
-
-### 🔧 Configurar Aider (Opcional)
-
-Se você quiser usar o Aider para pair programming:
+Precisa liberar espaço na cota da 42?
+Rodamos um script que remove apenas os binários baixados, mantendo seus dotfiles.
 
 ```bash
-export AIDER_MODEL="gemini/gemini-2.0-flash-001"
+./configurations/intermediate/clean.sh
 ```
-
-Este comando já está no `.zshrc`, então você não precisa fazer nada. Basta garantir que o Mods está configurado.
-
----
-
-## 📖 Guia de Uso
-
-### 🚀 Navegação Super Rápida (`z`)
-Esqueça o comando `cd` longo. O `z` aprende quais pastas você mais usa.
-- **Ir para uma pasta:** `z dot` (te leva para `~/dotfiles`)
-- **Voltar:** `z -`
-
-### 📂 Comandos Modernos
-Substituí os comandos antigos por versões melhores:
-
-| Comando | O que eu digito | O que ele faz |
-|---------|-----------------|---------------|
-| **Listar** | `ls` | Lista arquivos com ícones e cores (usa `eza`) |
-| **Listar Tudo** | `la` | Lista arquivos ocultos e detalhes |
-| **Ler Arquivo** | `cat arquivo.js` | Mostra o conteúdo colorido e com linhas (usa `bat`) |
-| **Buscar** | `Ctrl + R` | Busca no histórico de comandos |
-| **Limpar** | `ç` ou `Ctrl + L` | Limpa a tela |
-
-### 🤖 Inteligência Artificial no Terminal
-
-Você tem 3 comandos principais para IA:
-
-#### `gpro` - Gemini 2.0 Flash (Rápido e Poderoso)
-```bash
-gpro "Como faço um loop for em Rust?"
-```
-
-#### `gflash` - Gemini 1.5 Flash (Ultra Leve)
-```bash
-gflash "Explica o que é recursão"
-```
-
-#### `gemini-ui` - Interface Interativa
-```bash
-gemini-ui
-```
-Entre no modo chat e converse livremente com a IA.
-
-#### `gcommit` - Commits Automáticos com IA 🎯
-Uma das funcionalidades mais legais! A IA lê suas mudanças e sugere uma mensagem de commit:
-
-```bash
-git add .
-gcommit
-```
-
-A IA vai:
-1. Ler o diff do seu código
-2. Sugerir uma mensagem seguindo Conventional Commits
-3. Perguntar se você quer usar
-
-### 📝 Editor Vim/Neovim (Estilo IDE)
-O Vim está configurado com plugins essenciais.
-- **Abrir editor:** `vim arquivo.txt` ou `nvim arquivo.txt`
-- **Abrir árvore de arquivos:** `Ctrl + n`
-- **Navegar entre janelas:** `Ctrl + w` + setas
-- **Sair:** `:q` (ou `:wq` para salvar)
-
----
-
-## 🔄 Como Atualizar
-
-Eu atualizo este repositório frequentemente. Para puxar as novidades para sua máquina, basta rodar este comando de qualquer lugar:
-
-```bash
-update_dotfiles
-```
-
-Isso vai baixar as mudanças e reinstalar o que for necessário automaticamente.
-
----
-
-## 🛠️ Ferramentas Instaladas
-
-Este setup instala e configura as seguintes ferramentas:
-
-### Essenciais
-- **Zsh** - Shell moderno e poderoso
-- **Zinit** - Gerenciador de plugins do Zsh
-- **Eza** - Substituto moderno do `ls`
-- **Bat** - Substituto moderno do `cat`
-- **Zoxide** - Navegação inteligente (`z`)
-- **FZF** - Busca fuzzy interativa
-
-### Inteligência Artificial
-- **Mods** - Interface CLI para LLMs (Gemini)
-- **Aider** - Pair programming com IA
-
-### Desenvolvimento
-- **Neovim** - Editor de texto turbinado
-- **NVM** - Gerenciador de versões do Node.js
-- **Git** - Controle de versão (com integração IA)
-
----
-
-## 🐛 Troubleshooting
-
-### Os ícones não aparecem
-- Certifique-se de que configurou a fonte `MesloLGS NF` no seu terminal
-- Reinicie o terminal completamente
-
-### `command not found: brew`
-- Adicione o Homebrew ao PATH:
-  ```bash
-  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-  ```
-
-### `command not found: mods`
-- Instale via Homebrew: `brew install mods`
-- Verifique se o Homebrew está no PATH
-
-### A IA não responde
-- Configure sua API key: `mods --settings`
-- Teste a conexão: `gemini-ui "teste"`
-
----
-
-## 📝 Licença
-
-MIT License - Use e modifique à vontade!

@@ -1,0 +1,42 @@
+# --- CONFIGURAÇÃO BÁSICA (Extraída de 'basic') ---
+export PATH="$HOME/.local/bin:$HOME/.local/bin/scripts:$PATH"
+
+# ZINIT (Gerenciador de Plugins)
+# Certifique-se que o install.sh já instalou o zinit
+ZINIT_PATH="$HOME/.local/share/zinit/zinit.git/zinit.zsh"
+if [ -f "$ZINIT_PATH" ]; then
+    source "$ZINIT_PATH"
+    zinit light zsh-users/zsh-autosuggestions
+    zinit light zsh-users/zsh-syntax-highlighting
+fi
+
+# Aliases
+alias ç='clear'
+alias norm='norminette'
+alias ll='ls -l --color=auto'
+alias la='ls -la --color=auto'
+
+# --- ESTILO DO PROMPT (Dracula + Git) ---
+autoload -U colors && colors
+autoload -Uz vcs_info
+setopt prompt_subst
+
+# Configuração do Git
+zstyle ':vcs_info:*' enable git
+zstyle ':vcs_info:git*' formats '%F{#bd93f9}%b%f%F{#50fa7b}%u%f%F{#8be9fd}%a%f%F{#ff5555}%m%f'
+precmd() { vcs_info }
+
+# Prompt (Com quebra de linha)
+PS1=$'%B%F{#50fa7b}╭─%n@%m %F{#ff5555}[%F{#bd93f9}%2~%F{#ff5555}]%f%b ${vcs_info_msg_0_}%B%(?..[%F{#ff5555}%?%f])%b\n%F{#50fa7b}╰─➤%f '
+export RPROMPT='%F{#8be9fd}%*%f'
+
+# --- HISTÓRICO ---
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt appendhistory sharehistory hist_ignore_dups hist_ignore_space
+# --- CONFIGURAÇÕES LOCAIS (Seus Aliases Pessoais) ---
+# O instalador moveu seu .zshrc antigo para cá
+if [ -f "$HOME/.zshrc_local" ]; then
+    source "$HOME/.zshrc_local"
+fi
