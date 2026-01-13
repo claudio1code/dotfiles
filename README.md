@@ -21,7 +21,7 @@ O instalador interativo permite escolher entre três níveis de personalização
 Basta clonar e rodar o script. Um menu interativo guiará você.
 
 ```bash
-git clone https://github.com/SEU_USUARIO/dotfiles.git
+git clone https://github.com/claudio1code/dotfiles.git
 cd dotfiles
 ./install.sh
 ```
