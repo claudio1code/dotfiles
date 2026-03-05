@@ -1,279 +1,355 @@
 # Claudio's Dotfiles
 
-Bem-vindo ao meu setup de terminal! Este kit transforma um terminal Linux padrão (bash) em um ambiente de desenvolvimento moderno, bonito e produtivo, com **Zsh**, **Vim turbinado** e **IA integrada**.
+Bem-vindo ao meu setup de terminal modular! Este kit transforma um terminal Linux padrão em um ambiente de desenvolvimento moderno, bonito e produtivo, com **instalações adaptadas para diferentes cenários**.
 
-Funciona perfeitamente em:
-- **42 School** (Ambientes sem permissão de root)
-- **Linux** (Ubuntu, Debian, Arch, etc.)
-- **WSL** (Windows Subsystem for Linux)
+## Escolha Seu Perfil de Instalação
 
----
-
-## 📋 Pré-requisitos
-
-Certifique-se de ter o básico instalado (`git`, `curl` e `make`), que geralmente já vêm no sistema.
-
-### 1️⃣ Python Pip
-
-A maioria das distribuições Linux já vem com Python. Verifique:
-```bash
-python3 --version
-pip3 --version
-```
-
-Se não tiver, instale:
-```bash
-# Ubuntu/Debian
-sudo apt update && sudo apt install python3 python3-pip
-
-# Arch
-sudo pacman -S python python-pip
-```
-
-### 2️⃣ Go (Opcional, mas recomendado)
-
-Algumas ferramentas de IA podem usar Go. Instale via Homebrew:
-```bash
-brew install go
-```
+Escolha o cenário que melhor se adapta às suas necessidades:
 
 ---
 
-## 📥 Instalação
+### **Perfil Visual** - Apenas Beleza e Usabilidade
+**Ideal para:** Quem só quer um terminal bonito e moderno, sem ferramentas pesadas.
 
-Abra seu terminal e rode os comandos abaixo, um por um:
+**O que instala:**
+- Zsh + Zinit (plugins de autocomplete e syntax highlighting)
+- Eza (ls moderno com ícones)
+- Bat (cat colorido)
+- Fonte MesloLGS NF (ícones perfeitos)
+- Prompt bonito tema Dracula
 
-### Passo 1: Clone o Repositório
+**Instalação:**
 ```bash
 git clone https://github.com/claudio1code/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+bash install_visual.sh
 ```
 
-### Passo 2: Instale o Zinit (Gerenciador de Plugins do Zsh)
+**Espaço necessário:** ~50MB
 
-O Zinit gerencia os plugins do Zsh (autocomplete, syntax highlighting, etc.).
+---
 
+### **Perfil Work** - Produtividade para Desenvolvimento
+**Ideal para:** Desenvolvedores que precisam de ferramentas produtivas no dia a dia.
+
+**O que instala:**
+- Tudo do Perfil Visual +
+- Zoxide (navegação inteligente `z`)
+- FZF (busca fuzzy)
+- Git Delta (diffs bonitos)
+- NVM (gerenciador Node.js)
+- Neovim configurado
+- Git otimizado
+
+**Instalação:**
 ```bash
-mkdir -p ~/.local/share/zinit
-git clone https://github.com/zdharma-continuum/zinit.git ~/.local/share/zinit/zinit.git
+git clone https://github.com/claudio1code/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+bash install_work.sh
 ```
 
-### Passo 3: Instale as Ferramentas de IA
+**Espaço necessário:** ~200MB
+**Tempo estimado:** 2-3 minutos
 
-Estas são as ferramentas que trazem inteligência artificial para o seu terminal:
+---
 
-#### 🤖 Mods (Interface CLI para Gemini)
+### **Perfil AI** - Terminal com Inteligência Artificial
+**Ideal para:** Quem quer IA integrada ao terminal para máxima produtividade.
+
+**O que instala:**
+- Tudo do Perfil Work +
+- Mods (interface CLI para Gemini)
+- Aider (pair programming com IA)
+- Comandos `gpro`, `gflash`, `gemini-ui`
+- `gcommit` (commits automáticos com IA)
+
+**Instalação:**
 ```bash
-brew install mods
+git clone https://github.com/claudio1code/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+bash install_ai.sh
 ```
 
-O `mods` é usado pelos comandos `gpro`, `gflash` e `gemini-ui` no terminal.
+**Espaço necessário:** ~300MB
+**Tempo estimado:** 3-4 minutos
+**Requer:** API Key do Google Gemini (grátis)
 
-#### 🧑‍💻 Aider (Pair Programming com IA)
+---
+
+### **Perfil Fast** - Instalação Ultra-Rápida ⚡
+**Ideal para:** Quem quer TUDO instalado no menor tempo possível.
+
+**O que instala:**
+- ABSOLUTAMENTE TUDO (Personal + AI) +
+- Downloads paralelos massivos
+- Cache inteligente
+- Instalação otimizada
+
+**Instalação:**
 ```bash
-pip3 install aider-chat
+git clone https://github.com/claudio1code/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+bash install_fast.sh
 ```
 
-O Aider permite que você faça pair programming com a IA diretamente no terminal.
+**Espaço necessário:** ~600MB
+**Tempo estimado:** 2 minutos
+**Requer:** API Key do Google Gemini (grátis)
 
-### Passo 4: Execute o Instalador Principal
+---
 
-Agora rode o script de instalação que vai configurar tudo automaticamente:
+### **Perfil 42** - Otimizado para Escola 42
+**Ideal para:** Alunos da 42 com restrições (sem sudo, limite 10GB).
+
+**O que instala:**
+- Zsh + plugins essenciais
+- Ferramentas leves (instalação local)
+- Integração com norminette
+- Aliases para C/Makefile
+- Scripts de limpeza de espaço
+- Suporte para Francinette
+
+**Instalação:**
 ```bash
+git clone https://github.com/claudio1code/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+bash install_42.sh
+```
+
+**Espaço necessário:** ~100MB
+**Funciona:** Sem sudo, limite 10GB
+
+---
+
+### **Perfil Personal** - Setup Completo (Recomendado)
+**Ideal para:** Computador pessoal com permissões sudo.
+
+**O que instala:**
+- TUDO dos perfis anteriores +
+- Instalação via apt/brew (sistema)
+- Ferramentas adicionais (htop, tree, ripgrep)
+- Extensões VS Code
+- Configuração completa do sistema
+
+**Instalação:**
+```bash
+git clone https://github.com/claudio1code/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+bash install_personal.sh
+```
+
+**Espaço necessário:** ~500MB
+**Requer:** Permissão sudo
+
+---
+
+### **Perfil Completo** - Instalação Ultra-Completa
+**Ideal para:** Quem quer TUDO instalado de uma vez (máximo poder).
+
+**O que instala:**
+- ABSOLUTAMENTE TUDO +
+- Ferramentas de desenvolvimento adicionais
+- Configurações avançadas
+- Scripts de manutenção
+- Optimizações de performance
+
+**Instalação:**
+```bash
+git clone https://github.com/claudio1code/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 bash install.sh
 ```
 
-> **O que o instalador faz?**
-> - Baixa ferramentas modernas (`eza`, `bat`, `zoxide`) para sua pasta local
-> - Configura o Zsh como seu shell padrão
-> - Instala plugins do Zinit
-> - Configura o Vim/Neovim
-> - Instala a fonte MesloLGS NF com ícones
-> - Copia os arquivos de configuração (`.zshrc`, `.vimrc`)
+**Espaço necessário:** ~600MB
+**Requer:** Permissão sudo e espaço disponível
 
 ---
 
-## 🎨 Passo Crítico: Configurando a Fonte
+## Tabela Comparativa
 
-**LEIA COM ATENÇÃO:** Para que os ícones (pastinhas, setas, git branches) apareçam corretamente e não fiquem como quadrados (□), você precisa configurar o seu terminal para usar a fonte **MesloLGS NF**.
+| Recurso | Visual | Work | AI | 42 | Personal | Completo |
+|---------|--------|------|----|----|----------|----------|
+| Zsh + Plugins | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Ferramentas Visuais | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Navegação Inteligente | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Git Avançado | ❌ | ✅ | ✅ | ❌ | ✅ | ✅ |
+| Node.js/NVM | ❌ | ✅ | ✅ | ❌ | ✅ | ✅ |
+| Inteligência Artificial | ❌ | ❌ | ✅ | ❌ | ✅ | ✅ |
+| Suporte C/Norminette | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
+| Instalação Sistema | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
+| Sem Sudo | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| Scripts Manutenção | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
 
-O script já instalou essa fonte no seu sistema Linux (`~/.local/share/fonts`). Agora você precisa dizer ao seu emulador de terminal para usá-la.
+---
 
-### 🖥️ No VS Code
-1. Abra as configurações (`Ctrl + ,`)
-2. Digite na busca: `terminal font`
-3. Em **Terminal > Integrated: Font Family**, coloque exatamente:
-   ```text
+## Configuração Pós-Instalação
+
+### 1. Configurar a Fonte (CRÍTICO)
+
+Para que os ícones apareçam corretamente, configure a fonte **MesloLGS NF** no seu terminal:
+
+#### VS Code:
+1. `Ctrl + ,` (configurações)
+2. Busque: `terminal font`
+3. Em **Terminal > Integrated: Font Family**, coloque:
+   ```
    'MesloLGS NF'
    ```
-   *(Mantenha as aspas simples)*
 
-### 🪟 No Windows Terminal (WSL)
-Se você usa WSL, você precisa instalar a fonte **no Windows**, não só no Linux.
-1. Baixe os arquivos `.ttf` [neste link](https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf)
-2. Clique duas vezes no arquivo baixado e clique em **Instalar**
-3. No Windows Terminal:
-   - Vá em **Configurações** → Selecione seu perfil (Ubuntu/Debian) → **Aparência**
-   - Em **Tipo de fonte**, selecione `MesloLGS NF`
+#### Linux (Gnome Terminal/Terminator):
+1. Botão direito → Preferências
+2. Marque **Fonte personalizada**
+3. Selecione `MesloLGS NF Regular`
 
-### 🐧 No Linux (Gnome Terminal / Terminator)
-1. Clique com botão direito no terminal → **Preferências**
-2. Vá na aba do seu perfil (geralmente "Sem nome" ou "Padrão")
-3. Marque a caixa **Fonte personalizada**
-4. Procure e selecione `MesloLGS NF Regular`
+#### Windows Terminal (WSL):
+1. Baixe a fonte [aqui](https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf)
+2. Instale no Windows
+3. Configurações → Perfil → Aparência → Fonte: `MesloLGS NF`
+
+### 2. Configurar IA (Apenas Perfis AI e Personal)
+
+```bash
+# Configure sua API Key do Google
+mods --settings
+
+# Teste
+gpro "Olá! Como você está?"
+```
+
+**Obtenha sua API Key gratuita:** [Google AI Studio](https://makersuite.google.com/app/apikey)
 
 ---
 
-## ⚙️ Configuração da IA
+## Comandos Principais
 
-Para usar as ferramentas de inteligência artificial, você precisa configurar as credenciais:
-
-### 🔑 Configurar Google API Key (Gemini)
-
-1. **Obtenha sua chave de API:**
-   - Acesse [Google AI Studio](https://makersuite.google.com/app/apikey)
-   - Crie uma chave de API gratuita
-
-2. **Configure o Mods na primeira vez:**
-   ```bash
-   mods --settings
-   ```
-   Siga as instruções para adicionar sua API key do Google.
-
-3. **Teste se funcionou:**
-   ```bash
-   gemini-ui "Olá! Como você está?"
-   ```
-
-### 🔧 Configurar Aider (Opcional)
-
-Se você quiser usar o Aider para pair programming:
-
+### Navegação:
 ```bash
-export AIDER_MODEL="gemini/gemini-2.0-flash-001"
+z nome_da_pasta    # Navegação inteligente
+ls                 # Lista com ícones (eza)
+la                 # Lista arquivos ocultos
+cat arquivo        # Mostra conteúdo colorido (bat)
 ```
 
-Este comando já está no `.zshrc`, então você não precisa fazer nada. Basta garantir que o Mods está configurado.
+### Git:
+```bash
+gs                 # Git status
+ga .               # Git add all
+gcommit            # Commit automático com IA (perfis AI/Personal)
+```
+
+### IA (perfis AI/Personal):
+```bash
+gpro "pergunta"     # Gemini 2.0 Flash (rápido)
+gflash "pergunta"   # Gemini 1.5 Flash (leve)
+gemini-ui           # Modo chat interativo
+aider-pair          # Pair programming com IA
+```
+
+### 42 (perfil 42):
+```bash
+norm arquivo.c      # Verifica norminette
+compile_check x.c   # Compila e verifica norminette
+clean_42            # Limpa arquivos temporários
+clear_home42        # Libera espaço na home (SUPER ÚTIL!)
+```
+
+### Manutenção (todos os perfis):
+```bash
+clear_home42        # Limpeza pesada da home (útil para qualquer um)
+update_dotfiles     # Atualiza o dotfiles
+```
 
 ---
 
-## 📖 Guia de Uso
+## Como Atualizar
 
-### 🚀 Navegação Super Rápida (`z`)
-Esqueça o comando `cd` longo. O `z` aprende quais pastas você mais usa.
-- **Ir para uma pasta:** `z dot` (te leva para `~/dotfiles`)
-- **Voltar:** `z -`
-
-### 📂 Comandos Modernos
-Substituí os comandos antigos por versões melhores:
-
-| Comando | O que eu digito | O que ele faz |
-|---------|-----------------|---------------|
-| **Listar** | `ls` | Lista arquivos com ícones e cores (usa `eza`) |
-| **Listar Tudo** | `la` | Lista arquivos ocultos e detalhes |
-| **Ler Arquivo** | `cat arquivo.js` | Mostra o conteúdo colorido e com linhas (usa `bat`) |
-| **Buscar** | `Ctrl + R` | Busca no histórico de comandos |
-| **Limpar** | `ç` ou `Ctrl + L` | Limpa a tela |
-
-### 🤖 Inteligência Artificial no Terminal
-
-Você tem 3 comandos principais para IA:
-
-#### `gpro` - Gemini 2.0 Flash (Rápido e Poderoso)
-```bash
-gpro "Como faço um loop for em Rust?"
-```
-
-#### `gflash` - Gemini 1.5 Flash (Ultra Leve)
-```bash
-gflash "Explica o que é recursão"
-```
-
-#### `gemini-ui` - Interface Interativa
-```bash
-gemini-ui
-```
-Entre no modo chat e converse livremente com a IA.
-
-#### `gcommit` - Commits Automáticos com IA 🎯
-Uma das funcionalidades mais legais! A IA lê suas mudanças e sugere uma mensagem de commit:
-
-```bash
-git add .
-gcommit
-```
-
-A IA vai:
-1. Ler o diff do seu código
-2. Sugerir uma mensagem seguindo Conventional Commits
-3. Perguntar se você quer usar
-
-### 📝 Editor Vim/Neovim (Estilo IDE)
-O Vim está configurado com plugins essenciais.
-- **Abrir editor:** `vim arquivo.txt` ou `nvim arquivo.txt`
-- **Abrir árvore de arquivos:** `Ctrl + n`
-- **Navegar entre janelas:** `Ctrl + w` + setas
-- **Sair:** `:q` (ou `:wq` para salvar)
-
----
-
-## 🔄 Como Atualizar
-
-Eu atualizo este repositório frequentemente. Para puxar as novidades para sua máquina, basta rodar este comando de qualquer lugar:
+Para atualizar seu dotfiles para a versão mais recente:
 
 ```bash
 update_dotfiles
 ```
 
-Isso vai baixar as mudanças e reinstalar o que for necessário automaticamente.
+Este comando:
+1. Baixa as atualizações do repositório
+2. Reinstala o que for necessário
+3. Mantém suas configurações pessoais
 
 ---
 
-## 🛠️ Ferramentas Instaladas
+## Troubleshooting
 
-Este setup instala e configura as seguintes ferramentas:
+### Ícones não aparecem (quadrados □):
+- Configure a fonte MesloLGS NF (veja acima)
+- Reinicie completamente o terminal
 
-### Essenciais
-- **Zsh** - Shell moderno e poderoso
-- **Zinit** - Gerenciador de plugins do Zsh
-- **Eza** - Substituto moderno do `ls`
-- **Bat** - Substituto moderno do `cat`
-- **Zoxide** - Navegação inteligente (`z`)
-- **FZF** - Busca fuzzy interativa
+### Comando não encontrado:
+- Verifique se executou o script de instalação correto
+- Abra um novo terminal após a instalação
+- Para perfil 42: verifique se as ferramentas foram instaladas em `~/.local/bin`
 
-### Inteligência Artificial
-- **Mods** - Interface CLI para LLMs (Gemini)
-- **Aider** - Pair programming com IA
+### IA não responde:
+- Configure sua API Key: `mods --settings`
+- Teste conexão: `gpro "teste"`
+- Verifique se o Mods está instalado: `which mods`
 
-### Desenvolvimento
-- **Neovim** - Editor de texto turbinado
-- **NVM** - Gerenciador de versões do Node.js
-- **Git** - Controle de versão (com integração IA)
-
----
-
-## 🔎 Troubleshooting
-
-### Os ícones não aparecem
-- Certifique-se de que configurou a fonte `MesloLGS NF` no seu terminal
-- Reinicie o terminal completamente
-
-### `command not found: brew`
-- Adicione o Homebrew ao PATH:
-  ```bash
-  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-  ```
-
-### `command not found: mods`
-- Instale via Homebrew: `brew install mods`
-- Verifique se o Homebrew está no PATH
-
-### A IA não responde
-- Configure sua API key: `mods --settings`
-- Teste a conexão: `gemini-ui "teste"`
+### Problemas de permissão (perfil 42):
+- Os scripts instalam tudo localmente em `~/.local/bin`
+- Não precisa de sudo para nenhuma ferramenta
+- Se algo falhar, verifique o espaço disponível com `df -h ~`
 
 ---
 
-## 📝 Licença
+## Estrutura dos Arquivos
+
+```
+dotfiles/
+├── install_visual.sh      # Instalação apenas visual
+├── install_work.sh        # Instalação para trabalho
+├── install_ai.sh          # Instalação com IA
+├── install_fast.sh        # Instalação ultra-rápida ⚡
+├── install_42.sh          # Instalação para 42 (sem sudo)
+├── install_personal.sh    # Instalação completa (com sudo)
+├── install.sh             # Instalação ultra-completa (tudo)
+├── zshrc                  # Configuração completa
+├── zshrc_visual           # Configuração visual
+├── zshrc_work             # Configuração trabalho
+├── zshrc_ai               # Configuração IA
+├── zshrc_42               # Configuração 42
+├── .vimrc                 # Configuração Vim
+├── clear_home42.sh        # Limpeza pesada (SUPER ÚTIL)
+├── update.sh              # Atualização do sistema
+└── LICENSE                # Licença MIT
+```
+
+---
+
+## Comece Agora
+
+Escolha seu perfil e execute a instalação:
+
+```bash
+# Escolha um:
+bash install_visual.sh      # Mais leve (~1 minuto)
+bash install_work.sh        # Produtivo (~2-3 minutos)
+bash install_ai.sh          # Com IA (~3-4 minutos)
+bash install_fast.sh        # Ultra-Rápido ⚡ (~2 minutos)
+bash install_42.sh          # Para 42 (~2 minutos)
+bash install_personal.sh    # Completo (~5 minutos)
+bash install.sh             # Ultra-Completo (~15 minutos)
+```
+
+**Recomendação:** 
+- **Mais rápido:** `install_fast.sh` - Tudo em 2 minutos
+- **Computador pessoal:** `install_fast.sh` ou `install_personal.sh`
+- **Escola 42:** `install_42.sh`
+- **Apenas beleza:** `install_visual.sh`
+
+---
+
+## Licença
 
 MIT License - Use e modifique à vontade!
+
+---
+
+**Transforme seu terminal hoje mesmo!**

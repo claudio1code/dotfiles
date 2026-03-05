@@ -1,5 +1,15 @@
+# --- CONFIGURAÇÃO INTELIGENTE DO HOMEBREW ---
+if [ -d "$HOME/.brew/bin" ]; then
+    export PATH="$HOME/.brew/bin:$PATH"
+    eval "$($HOME/.brew/bin/brew shellenv)"
+elif [ -d "/home/linuxbrew/.linuxbrew/bin" ]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+elif [ -d "/opt/homebrew/bin" ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
 # --- CONFIGURAÇÃO BÁSICA ---
-export PATH="$HOME/.local/bin:$HOME/.local/bin/scripts:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 
 # ZINIT (Gerenciador de Plugins)
 source ~/.local/share/zinit/zinit.git/zinit.zsh
@@ -15,28 +25,19 @@ alias ls='eza --icons'
 alias l='eza -l --icons'
 alias la='eza -la --icons'
 alias ç='clear'
-alias guia='bat ~/.guia.md'
 alias vim='nvim'
 alias vi='nvim'
-alias vimguia='bat ~/vim_cheatsheet.md'
-alias norm='norminette'
 
-# Francinette (Ajuste o caminho se necessário)
-alias francinette=~/francinette/tester.sh
-alias paco=~/francinette/tester.sh
-
-# --- ESTILO DO PROMPT (Dracula + Git) ---
+# --- ESTILO DO PROMPT (AI Theme) ---
 autoload -U colors && colors
 autoload -Uz vcs_info
 setopt prompt_subst
 
-# Configuração do Git
 zstyle ':vcs_info:*' enable git
 zstyle ':vcs_info:git*' formats '%F{#bd93f9}%b%f%F{#50fa7b}%u%f%F{#8be9fd}%a%f%F{#ff5555}%m%f'
 precmd() { vcs_info }
 
-# Prompt (Com quebra de linha)
-PS1=$'%B%F{#50fa7b}╭─%n@%m %F{#ff5555}[%F{#bd93f9}%2~%F{#ff5555}]%f%b ${vcs_info_msg_0_}%B%(?..[%F{#ff5555}%?%f])%b\n%F{#50fa7b}╰─➤%f '
+PS1=$'%B%F{#50fa7b}╭─%n@%m %F{#ff5555}[%F{#bd93f9}%2~%F{#ff5555}]%f%b ${vcs_info_msg_0_}%B%(?..[%F{#ff5555}%?%f])%b\n%F{#50fa7b}╰─🤖%f '
 export RPROMPT='%F{#8be9fd}%*%f'
 
 # --- HISTÓRICO ---
@@ -46,13 +47,7 @@ SAVEHIST=10000
 setopt appendhistory sharehistory hist_ignore_dups hist_ignore_space
 
 # --- FERRAMENTAS EXTRAS ---
-# FZF
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-# NVM (Node)
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
 
 # --- INTELIGÊNCIA ARTIFICIAL ---
 # Carrega segredos (Crie um arquivo .env para colocar suas chaves!)
@@ -95,7 +90,10 @@ gcommit() {
     fi
 }
 
-# Keybindings (Ctrl+Setas)
+# Aliases para Aider
+alias aider-pair='aider --model gemini/gemini-2.0-flash-001'
+alias aider-chat='aider --chat-mode'
+
+# Keybindings
 bindkey '^[[1;5D' backward-word
 bindkey '^[[1;5C' forward-word
-

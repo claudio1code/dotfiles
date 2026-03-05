@@ -1,0 +1,99 @@
+#!/bin/bash
+set -e
+
+# Cores
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+REPO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+ZINIT_HOME="$HOME/.local/share/zinit/zinit.git"
+
+echo -e "${BLUE}💼 Instalação Work Ultra-Rápida - Produtividade para Desenvolvimento${NC}"
+echo -e "${YELLOW}Cenário: Foco em produtividade para trabalho/desenvolvimento${NC}"
+
+# Função para download ultra-rápido
+download_tool() {
+    local name=$1
+    local url=$2
+    local extract_cmd=$3
+    
+    if ! command -v "$name" &> /dev/null; then
+        echo "⚡ Baixando $name..."
+        if [[ $extract_cmd == "tar" ]]; then
+            curl -sL --connect-timeout 10 --max-time 30 "$url" | tar xz -C "$HOME/.local/bin" --strip-components=1 "$name" 2>/dev/null || true
+        else
+            curl -sL --connect-timeout 10 --max-time 30 -o "$HOME/.local/bin/$name" "$url"
+        fi
+        chmod +x "$HOME/.local/bin/$name" 2>/dev/null || true
+    fi
+}
+
+# Iniciar todos os downloads em paralelo imediatamente
+echo -e "${BLUE}🚀 Iniciando Downloads Paralelos...${NC}"
+mkdir -p "$HOME/.local/bin"
+
+# Downloads em background (todos ao mesmo tempo)
+download_tool "eza" "https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz" "tar" &
+download_tool "bat" "https://github.com/sharkdp/bat/releases/latest/download/bat-v0.24.0-x86_64-unknown-linux-gnu.tar.gz" "tar" &
+download_tool "zoxide" "https://github.com/ajeetdsouza/zoxide/releases/latest/download/zoxide-x86_64-unknown-linux-musl.tar.gz" "tar" &
+download_tool "fzf" "https://github.com/junegunn/fzf/releases/latest/download/fzf-0.53.0-linux_amd64.tar.gz" "tar" &
+download_tool "delta" "https://github.com/dandavison/delta/releases/latest/download/delta-0.18.2-x86_64-unknown-linux-gnu.tar.gz" "tar" &
+
+# Zinit em paralelo
+if [ ! -d "$ZINIT_HOME" ]; then
+    mkdir -p "$(dirname "$ZINIT_HOME")"
+    git clone --depth 1 https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME" &
+fi
+
+# Fontes em paralelo
+FONT_DIR="$HOME/.local/share/fonts"
+mkdir -p "$FONT_DIR"
+curl -sL --connect-timeout 10 -o "$FONT_DIR/MesloLGS NF Regular.ttf" "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf" &
+curl -sL --connect-timeout 10 -o "$FONT_DIR/MesloLGS NF Bold.ttf" "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf" &
+curl -sL --connect-timeout 10 -o "$FONT_DIR/MesloLGS NF Italic.ttf" "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf" &
+curl -sL --connect-timeout 10 -o "$FONT_DIR/MesloLGS NF Bold Italic.ttf" "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf" &
+
+# NVM em paralelo
+if [ ! -d "$HOME/.nvm" ]; then
+    curl -sL --connect-timeout 10 -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash &
+fi
+
+# Vim-plug em paralelo
+curl -sL --connect-timeout 10 -fLo "$HOME/.vim/autoload/plug.vim" --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim &
+
+# Esperar todos os downloads
+echo -e "${BLUE}⏳ Aguardando downloads completarem...${NC}"
+wait
+
+# Configurações (rápido)
+echo -e "${BLUE}⚙️ Configurando ambiente...${NC}"
+ln -sf "$REPO_DIR/zshrc_work" "$HOME/.zshrc"
+ln -sf "$REPO_DIR/.vimrc" "$HOME/.vimrc"
+mkdir -p "$HOME/.local/bin"
+ln -sf "$REPO_DIR/update.sh" "$HOME/.local/bin/update_dotfiles"
+chmod +x "$REPO_DIR/update.sh"
+
+# Cache de fontes em background
+if command -v fc-cache &> /dev/null; then
+    fc-cache -f "$FONT_DIR" &
+fi
+
+# Mudar shell
+if command -v zsh &> /dev/null; then
+    if [ "$SHELL" != "$(which zsh)" ]; then
+        chsh -s "$(which zsh)" 2>/dev/null || true
+    fi
+fi
+
+wait
+
+echo -e "\n${GREEN}⚡ Instalação Work Ultra-Rápida Concluída!${NC}"
+echo -e "${YELLOW}📝 Próximos passos:${NC}"
+echo -e "1. Configure a fonte MesloLGS NF no seu terminal"
+echo -e "2. Abra um novo terminal ou rode: ${BLUE}zsh${NC}"
+echo -e "3. Instale plugins do Vim: ${BLUE}vim +PlugInstall +qall${NC}"
+echo -e "4. Instale Node: ${BLUE}nvm install 20${NC}"
+echo -e "\n${GREEN}🎉 Tempo total: ~2 minutos!${NC}"
