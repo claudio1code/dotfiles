@@ -1,6 +1,6 @@
 # Claudio's Dotfiles
 
-Bem-vindo ao meu setup de terminal modular! Este kit transforma um terminal Linux padrão em um ambiente de desenvolvimento moderno, bonito e produtivo, com **instalações adaptadas para diferentes cenários**.
+Bem-vindo ao meu setup de terminal modular! Este kit transforma um terminal Linux padrão em um ambiente de desenvolvimento moderno, estiloso e produtivo, com **instalações adaptadas para diferentes cenários**.
 
 ## Escolha Seu Perfil de Instalação
 
@@ -8,15 +8,15 @@ Escolha o cenário que melhor se adapta às suas necessidades:
 
 ---
 
-### **Perfil Visual** - Apenas Beleza e Usabilidade
-**Ideal para:** Quem só quer um terminal bonito e moderno, sem ferramentas pesadas.
+### **Perfil Visual** - Apenas Estilo e Usabilidade
+**Ideal para:** Quem só quer um terminal style e moderno, sem ferramentas pesadas.
 
 **O que instala:**
 - Zsh + Zinit (plugins de autocomplete e syntax highlighting)
 - Eza (ls moderno com ícones)
 - Bat (cat colorido)
 - Fonte MesloLGS NF (ícones perfeitos)
-- Prompt bonito tema Dracula
+- Prompt bonito
 
 **Instalação:**
 ```bash
