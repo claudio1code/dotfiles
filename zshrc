@@ -1,6 +1,8 @@
 # --- CONFIGURAÇÃO BÁSICA ---
 export PATH="$HOME/.local/bin:$HOME/.local/bin/scripts:$PATH"
 
+export PATH="$PATH:$HOME/.venv/bin"
+
 # ZINIT (Gerenciador de Plugins)
 source ~/.local/share/zinit/zinit.git/zinit.zsh
 zinit light zsh-users/zsh-autosuggestions
@@ -10,7 +12,7 @@ zinit light zsh-users/zsh-syntax-highlighting
 eval "$(zoxide init zsh)"
 
 # --- ALIASES ---
-alias cat='bat --paging=never'
+#alias cat='bat --paging=never'
 alias ls='eza --icons'
 alias l='eza -l --icons'
 alias la='eza -la --icons'
@@ -20,6 +22,15 @@ alias vim='nvim'
 alias vi='nvim'
 alias vimguia='bat ~/vim_cheatsheet.md'
 alias norm='norminette'
+# Alias para verificar a saude do sistema (SOC Status)
+alias soc-status='echo "--- UFW ---" && sudo ufw status | grep active && echo "--- SSH ---" && sudo ss -tulpn | grep 4141 && echo "--- FAIL2BAN ---" && sudo fail2ban-client status sshd'
+
+# Alias para Auditoria Rapida
+alias soc-check='sudo aide --check && sudo rkhunter --check --sk'
+
+# Alias para ver os logs do HoneyPot
+alias soc-honey='tail -f /var/log/honeypot.log'
+
 
 # Francinette (Ajuste o caminho se necessário)
 alias francinette=~/francinette/tester.sh
@@ -64,7 +75,7 @@ export AIDER_MODEL="gemini/gemini-2.0-flash-001"
 alias gpro='mods --api google --model gemini-2.0-flash-001 --no-cache'
 alias gflash='mods --api google --model gemini-1.5-flash-latest --no-cache'
 alias gemini-ui='mods --api google --model gemini-2.0-flash-001 --no-cache'
-alias gemini='gemini-ui'
+#alias gemini='gemini-cli'
 
 # Função gcommit (Commits Automáticos)
 gcommit() {
@@ -80,7 +91,7 @@ gcommit() {
     TEXTO DE ENTRADA (DIFF): $DIFF_CONTENT"
     
     echo "🤖 Gerando sugestão..."
-    SUGESTAO=$(gemini-ui "$PROMPT")
+    SUGESTAO=$(gemini "$PROMPT")
     
     echo -e "\n----------------------------------------"
     echo -e "Sugestão: \033[1;32m$SUGESTAO\033[0m"
