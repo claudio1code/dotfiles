@@ -2,8 +2,6 @@
 
 Este repositório contém as configurações base do meu ambiente de desenvolvimento no Linux. Ele é focado em produtividade, interface (Zsh + temas) e desenvolvimento de software (com suporte específico para o ambiente da escola 42).
 
-> **Nota:** Ferramentas ofensivas, dicionários e scripts de automação de pentest estão armazenados em um repositório privado separado por questões de OPSEC.
-
 ## Estrutura do Repositório
 
 - `install.sh` - Script interativo único para instalação do ambiente.
