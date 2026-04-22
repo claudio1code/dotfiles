@@ -1,15 +1,7 @@
-# --- CONFIGURAÇÃO INTELIGENTE DO HOMEBREW ---
-if [ -d "$HOME/.brew/bin" ]; then
-    export PATH="$HOME/.brew/bin:$PATH"
-    eval "$($HOME/.brew/bin/brew shellenv)"
-elif [ -d "/home/linuxbrew/.linuxbrew/bin" ]; then
-    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-elif [ -d "/opt/homebrew/bin" ]; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-fi
-
 # --- CONFIGURAÇÃO BÁSICA ---
-export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/.local/bin/scripts:$PATH"
+
+export PATH="$PATH:$HOME/.venv/bin"
 
 # ZINIT (Gerenciador de Plugins)
 source ~/.local/share/zinit/zinit.git/zinit.zsh
@@ -20,24 +12,25 @@ zinit light zsh-users/zsh-syntax-highlighting
 eval "$(zoxide init zsh)"
 
 # --- ALIASES ---
-alias cat='bat --paging=never'
+#alias cat='bat --paging=never'
 alias ls='eza --icons'
 alias l='eza -l --icons'
 alias la='eza -la --icons'
 alias ç='clear'
-alias vim='nvim'
-alias vi='nvim'
 
-# --- ESTILO DO PROMPT (AI Theme) ---
+
+# --- ESTILO DO PROMPT (Dracula + Git) ---
 autoload -U colors && colors
 autoload -Uz vcs_info
 setopt prompt_subst
 
+# Configuração do Git
 zstyle ':vcs_info:*' enable git
 zstyle ':vcs_info:git*' formats '%F{#bd93f9}%b%f%F{#50fa7b}%u%f%F{#8be9fd}%a%f%F{#ff5555}%m%f'
 precmd() { vcs_info }
 
-PS1=$'%B%F{#50fa7b}╭─%n@%m %F{#ff5555}[%F{#bd93f9}%2~%F{#ff5555}]%f%b ${vcs_info_msg_0_}%B%(?..[%F{#ff5555}%?%f])%b\n%F{#50fa7b}╰─🤖%f '
+# Prompt (Com quebra de linha)
+PS1=$'%B%F{#50fa7b}╭─%n@%m %F{#ff5555}[%F{#bd93f9}%2~%F{#ff5555}]%f%b ${vcs_info_msg_0_}%B%(?..[%F{#ff5555}%?%f])%b\n%F{#50fa7b}╰─➤%f '
 export RPROMPT='%F{#8be9fd}%*%f'
 
 # --- HISTÓRICO ---
@@ -47,7 +40,13 @@ SAVEHIST=10000
 setopt appendhistory sharehistory hist_ignore_dups hist_ignore_space
 
 # --- FERRAMENTAS EXTRAS ---
+# FZF
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# NVM (Node)
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
 
 # --- INTELIGÊNCIA ARTIFICIAL ---
 # Carrega segredos (Crie um arquivo .env para colocar suas chaves!)
@@ -56,10 +55,7 @@ setopt appendhistory sharehistory hist_ignore_dups hist_ignore_space
 export AIDER_MODEL="gemini/gemini-2.0-flash-001"
 
 # Aliases Mods
-alias gpro='mods --api google --model gemini-2.0-flash-001 --no-cache'
-alias gflash='mods --api google --model gemini-1.5-flash-latest --no-cache'
-alias gemini-ui='mods --api google --model gemini-2.0-flash-001 --no-cache'
-alias gemini='gemini-ui'
+alias gpro='gemini -p'
 
 # Função gcommit (Commits Automáticos)
 gcommit() {
@@ -75,7 +71,7 @@ gcommit() {
     TEXTO DE ENTRADA (DIFF): $DIFF_CONTENT"
     
     echo "🤖 Gerando sugestão..."
-    SUGESTAO=$(gemini-ui "$PROMPT")
+    SUGESTAO=$(gemini "$PROMPT")
     
     echo -e "\n----------------------------------------"
     echo -e "Sugestão: \033[1;32m$SUGESTAO\033[0m"
@@ -90,10 +86,7 @@ gcommit() {
     fi
 }
 
-# Aliases para Aider
-alias aider-pair='aider --model gemini/gemini-2.0-flash-001'
-alias aider-chat='aider --chat-mode'
-
-# Keybindings
+# Keybindings (Ctrl+Setas)
 bindkey '^[[1;5D' backward-word
 bindkey '^[[1;5C' forward-word
+
