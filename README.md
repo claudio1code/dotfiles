@@ -16,8 +16,10 @@ cd ~/dotfiles
 ./install.sh
 ```
 
-O instalador é idempotente: pode rodar quantas vezes quiser. Ao final, abra um
-novo terminal ou rode `zsh`.
+O instalador é idempotente: pode rodar quantas vezes quiser. Ao final ele define
+o `zsh` como shell padrão automaticamente (vale no próximo login); para não
+alterar o shell padrão, rode com `DOTFILES_NO_CHSH=1 ./install.sh`. Abra um novo
+terminal ou rode `zsh` para começar.
 
 ### Sem permissão de sudo (ex.: 42, servidores restritos)
 
