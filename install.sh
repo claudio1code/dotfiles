@@ -138,14 +138,17 @@ else
 fi
 
 # -------------------------------------------------------------
-#  5. Shell padrao (opcional)
+#  5. Shell padrao: define zsh automaticamente
+#     (opt-out: rode com DOTFILES_NO_CHSH=1 para nao alterar)
 # -------------------------------------------------------------
-if command -v zsh >/dev/null 2>&1 && [ "${SHELL:-}" != "$(command -v zsh)" ]; then
-    say "Shell padrao"
-    echo -n "  Definir zsh como shell padrao agora? [s/N] "
-    read -r ans || ans=""
-    if [[ "$ans" =~ ^[SsYy]$ ]]; then
-        chsh -s "$(command -v zsh)" && ok "shell padrao alterado (vale no proximo login)" || warn "nao foi possivel rodar chsh"
+CURRENT_SHELL="$(getent passwd "$(id -un)" | cut -d: -f7)"
+if command -v zsh >/dev/null 2>&1 && [ "${DOTFILES_NO_CHSH:-0}" != "1" ] \
+   && [ "$CURRENT_SHELL" != "$(command -v zsh)" ]; then
+    say "Definindo zsh como shell padrao"
+    if chsh -s "$(command -v zsh)" 2>/dev/null; then
+        ok "shell padrao = zsh (vale no proximo login)"
+    else
+        warn "chsh falhou (pode pedir senha). Rode manualmente: chsh -s \"\$(which zsh)\""
     fi
 fi
 
