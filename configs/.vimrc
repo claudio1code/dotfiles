@@ -6,14 +6,13 @@ set shiftwidth=4
 set expandtab
 set autoindent
 set smartindent
-set syntax=on
 set hlsearch
 set incsearch
 set showmatch
 set ruler
 set laststatus=2
 
-" Cores
+" Sintaxe e cores
 syntax on
 colorscheme default
 

@@ -1,16 +1,14 @@
-# Dotfiles - Claudio (Public)
+# Dotfiles
 
-Este repositório contém as configurações base do meu ambiente de desenvolvimento no Linux. Ele é focado em produtividade, interface (Zsh + temas) e desenvolvimento de software (com suporte específico para o ambiente da escola 42).
+Ambiente de terminal para Linux/WSL focado em produtividade e leveza:
+Zsh com prompt Git, ferramentas modernas de linha de comando e integração
+opcional com IA via Claude CLI.
 
-## Estrutura do Repositório
+Projetado para instalar em qualquer máquina sem deixar resíduos: usa o
+gerenciador de pacotes nativo (`apt`) quando há `sudo`, ou binários estáticos
+em `~/.local/bin` quando não há (por exemplo, máquinas restritas sem `sudo`).
 
-- `install.sh` - Script interativo único para instalação do ambiente.
-- `configs/` - Configurações modulares (Zsh, Vim, etc).
-- `scripts/` - Scripts auxiliares úteis (como `clear_home42`).
-
-## Instalação
-
-Clone o repositório e execute o script instalador. Ele perguntará qual perfil você deseja instalar.
+## Instalação rápida
 
 ```bash
 git clone https://github.com/claudio1code/dotfiles.git ~/dotfiles
@@ -18,18 +16,75 @@ cd ~/dotfiles
 ./install.sh
 ```
 
-### Perfis Disponíveis:
-1. **Básico:** Apenas melhorias visuais (Eza, Bat, Zsh).
-2. **Desenvolvimento:** Básico + navegação inteligente e ferramentas Git.
-3. **Ambiente 42:** Otimizado para rodar nas máquinas da 42 (sem permissão de sudo).
-4. **Completo:** Tudo acima, incluindo ferramentas de sistema e plugins avançados.
+O instalador é idempotente: pode rodar quantas vezes quiser. Ao final, abra um
+novo terminal ou rode `zsh`.
 
-Durante a instalação, você também poderá optar por instalar integrações de **Inteligência Artificial** (Aider, Mods) para suporte no terminal.
+### Sem permissão de sudo (ex.: 42, servidores restritos)
 
-## Ferramentas Inclusas (Dependendo do Perfil)
-- **Terminal:** Zsh, Zinit, Temas.
-- **Utilidades:** Eza (ls moderno), Bat (cat com syntax highlighting), Zoxide (cd inteligente), FZF (busca fuzzy).
-- **IA:** Mods (CLI para Gemini), Aider.
+```bash
+DOTFILES_NO_SUDO=1 ./install.sh
+```
+
+Nesse modo todas as ferramentas são instaladas como binários estáticos em
+`~/.local/bin`, sem tocar no sistema. O `zsh` em si precisa de `sudo`; se ele
+não estiver presente, o instalador avisa o comando para instalá-lo.
+
+## O que é instalado
+
+| Ferramenta | Função |
+|------------|--------|
+| Zsh + Zinit | Shell e gerenciador de plugins (carregamento leve) |
+| zsh-autosuggestions, zsh-syntax-highlighting | Sugestões e cores ao digitar |
+| eza | Substituto moderno do `ls` (com ícones) |
+| bat | `cat` com realce de sintaxe |
+| fd | `find` mais rápido e simples |
+| ripgrep (`rg`) | Busca em texto extremamente rápida |
+| zoxide | `cd` inteligente, baseado em frequência |
+| fzf | Busca fuzzy interativa no terminal |
+| gh | GitHub CLI (PRs, issues, releases) |
+| MesloLGS NF | Fonte com ícones para o prompt e o `eza` |
+
+Por que não Homebrew: no Linux/WSL ele é pesado e lento. Aqui usamos `apt` ou
+binários estáticos, que são mais leves e rápidos.
+
+## Estrutura
+
+- `install.sh` — instalador único e idempotente.
+- `configs/zshrc` — configuração do Zsh (link para `~/.zshrc`).
+- `configs/.vimrc` — configuração básica do Vim (link para `~/.vimrc`).
+- `scripts/update.sh` — atualiza o repo e reaplica o instalador.
+- `scripts/clear_home.sh` — limpa caches regeneráveis da home (seguro).
+
+Os scripts ficam disponíveis no `PATH` como `update_dotfiles` e `clear_home`.
+
+## Integração com IA (Claude CLI)
+
+O fluxo antigo com Gemini foi removido (autenticação descontinuada). No lugar,
+a configuração usa o **Claude CLI** (`claude`), que você instala e autentica
+separadamente:
+
+- `ai "sua pergunta"` — pergunta rápida no terminal (`claude -p`).
+- `gcommit` — gera uma mensagem de commit no padrão Conventional Commits a
+  partir do que está no stage (`git add`), pede confirmação e faz o commit.
+
+Se o comando `claude` não estiver instalado, esses atalhos simplesmente avisam
+e não quebram o terminal.
+
+## Comandos úteis depois de instalar
+
+```bash
+update_dotfiles   # git pull + reaplica o instalador
+clear_home        # limpa caches (mostra quanto liberou)
+gcommit           # mensagem de commit gerada por IA
+ai "como ver portas abertas?"
+```
+
+## Personalização
+
+- Segredos locais (tokens, chaves): crie `~/.env`. Ele é carregado pelo Zsh e
+  não vai para o repositório.
+- Prompt: tema Dracula com informações de Git, definido em `configs/zshrc`.
 
 ## Licença
-MIT License
+
+MIT. Veja `LICENSE`.

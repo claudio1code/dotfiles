@@ -1,92 +1,135 @@
-# --- CONFIGURAÇÃO BÁSICA ---
-export PATH="$HOME/.local/bin:$HOME/.local/bin/scripts:$PATH"
+# =============================================================
+#  Zsh config - dotfiles (claudio1code)
+#  Foco: produtividade, leveza e zero dependencia quebrada.
+#  Todas as integracoes sao guardadas: se a ferramenta nao
+#  estiver instalada, a linha e ignorada (nada de erro no boot).
+# =============================================================
 
-export PATH="$PATH:$HOME/.venv/bin"
+# --- PATH ---
+export PATH="$HOME/.local/bin:$PATH"
+[ -d "$HOME/.venv/bin" ] && export PATH="$PATH:$HOME/.venv/bin"
 
-# ZINIT (Gerenciador de Plugins)
-source ~/.local/share/zinit/zinit.git/zinit.zsh
-zinit light zsh-users/zsh-autosuggestions
-zinit light zsh-users/zsh-syntax-highlighting
+# --- ZINIT (gerenciador de plugins, carregamento leve) ---
+ZINIT_HOME="$HOME/.local/share/zinit/zinit.git"
+if [ -f "$ZINIT_HOME/zinit.zsh" ]; then
+    source "$ZINIT_HOME/zinit.zsh"
+    zinit light zsh-users/zsh-autosuggestions
+    zinit light zsh-users/zsh-syntax-highlighting
+fi
 
-# Zoxide (CD Inteligente)
-eval "$(zoxide init zsh)"
+# --- COMPLETIONS ---
+autoload -Uz compinit && compinit -C
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 
-# --- ALIASES ---
-#alias cat='bat --paging=never'
-alias ls='eza --icons'
-alias l='eza -l --icons'
-alias la='eza -la --icons'
+# --- ALIASES DE FERRAMENTAS (com fallback) ---
+# eza (ls moderno) -> cai para ls se nao existir
+if command -v eza >/dev/null 2>&1; then
+    alias ls='eza --icons --group-directories-first'
+    alias l='eza -l --icons --group-directories-first'
+    alias la='eza -la --icons --group-directories-first'
+    alias lt='eza --tree --level=2 --icons'
+else
+    alias ls='ls --color=auto'
+    alias l='ls -l'
+    alias la='ls -la'
+fi
+
+# bat (cat com highlight). No apt o binario chama-se batcat.
+if command -v bat >/dev/null 2>&1; then
+    alias cat='bat --paging=never'
+elif command -v batcat >/dev/null 2>&1; then
+    alias bat='batcat'
+    alias cat='batcat --paging=never'
+fi
+
+# fd (find moderno). No apt o binario chama-se fdfind.
+if ! command -v fd >/dev/null 2>&1 && command -v fdfind >/dev/null 2>&1; then
+    alias fd='fdfind'
+fi
+
 alias ç='clear'
+alias gs='git status'
+alias gl='git log --oneline --graph --decorate -20'
 
+# --- ZOXIDE (cd inteligente) ---
+command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
+
+# --- FZF (busca fuzzy) ---
+# fzf >= 0.48 gera a integracao do shell direto; sem arquivos soltos.
+if command -v fzf >/dev/null 2>&1; then
+    source <(fzf --zsh) 2>/dev/null
+fi
+
+# --- NVM (Node) ---
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
+
+# --- SEGREDOS LOCAIS (opcional) ---
+# Crie ~/.env para chaves/API tokens que nao devem ir ao repo.
+[ -f "$HOME/.env" ] && source "$HOME/.env"
 
 # --- ESTILO DO PROMPT (Dracula + Git) ---
 autoload -U colors && colors
 autoload -Uz vcs_info
 setopt prompt_subst
-
-# Configuração do Git
 zstyle ':vcs_info:*' enable git
-zstyle ':vcs_info:git*' formats '%F{#bd93f9}%b%f%F{#50fa7b}%u%f%F{#8be9fd}%a%f%F{#ff5555}%m%f'
+zstyle ':vcs_info:git*' formats '%F{#bd93f9}%b%f%F{#50fa7b}%u%f%F{#8be9fd}%a%f%F{#ff5555}%m%f'
 precmd() { vcs_info }
-
-# Prompt (Com quebra de linha)
 PS1=$'%B%F{#50fa7b}╭─%n@%m %F{#ff5555}[%F{#bd93f9}%2~%F{#ff5555}]%f%b ${vcs_info_msg_0_}%B%(?..[%F{#ff5555}%?%f])%b\n%F{#50fa7b}╰─➤%f '
 export RPROMPT='%F{#8be9fd}%*%f'
 
-# --- HISTÓRICO ---
-HISTFILE=~/.zsh_history
+# --- HISTORICO ---
+HISTFILE="$HOME/.zsh_history"
 HISTSIZE=10000
 SAVEHIST=10000
 setopt appendhistory sharehistory hist_ignore_dups hist_ignore_space
 
-# --- FERRAMENTAS EXTRAS ---
-# FZF
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# --- KEYBINDINGS (Ctrl+setas = pular palavra) ---
+bindkey '^[[1;5D' backward-word
+bindkey '^[[1;5C' forward-word
 
-# NVM (Node)
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
+# =============================================================
+#  INTELIGENCIA ARTIFICIAL (Claude CLI)
+#  Substitui o antigo fluxo do Gemini (auth descontinuada).
+#  Requer o Claude Code instalado e autenticado (comando claude).
+# =============================================================
 
-# --- INTELIGÊNCIA ARTIFICIAL ---
-# Carrega segredos (Crie um arquivo .env para colocar suas chaves!)
-[ -f ~/.env ] && source ~/.env
+# Pergunta rapida no terminal:  ai "como listo portas abertas?"
+command -v claude >/dev/null 2>&1 && alias ai='claude -p'
 
-export AIDER_MODEL="gemini/gemini-2.0-flash-001"
-
-# Aliases Mods
-alias gpro='gemini -p'
-
-# Função gcommit (Commits Automáticos)
+# gcommit: gera mensagem de commit (Conventional Commits) a partir
+# do que esta no stage, usando o Claude em modo headless.
 gcommit() {
-    if git diff --cached --quiet; then
-        echo "⚠️  Nada estagiado para commit."
+    if ! command -v claude >/dev/null 2>&1; then
+        echo "claude CLI nao encontrado. Instale o Claude Code primeiro."
         return 1
     fi
-    echo "🤖 Lendo alterações..."
-    DIFF_CONTENT=$(git diff --cached)
-    PROMPT="INSTRUÇÃO: Aja apenas como um formatador de texto.
-    TAREFA: Escreva uma mensagem de commit (Conventional Commits) baseada APENAS no texto abaixo.
-    REGRAS: Retorne APENAS a string da mensagem final.
-    TEXTO DE ENTRADA (DIFF): $DIFF_CONTENT"
-    
-    echo "🤖 Gerando sugestão..."
-    SUGESTAO=$(gemini "$PROMPT")
-    
-    echo -e "\n----------------------------------------"
-    echo -e "Sugestão: \033[1;32m$SUGESTAO\033[0m"
-    echo -e "----------------------------------------\n"
-    
+    if git diff --cached --quiet; then
+        echo "Nada estagiado para commit (use 'git add')."
+        return 1
+    fi
+    local diff prompt msg
+    diff="$(git diff --cached)"
+    prompt="Aja como um formatador de texto. Escreva UMA mensagem de commit no padrao Conventional Commits (ex: 'feat: ...', 'fix: ...') baseada apenas no diff abaixo. Responda APENAS com a string da mensagem, sem aspas, sem explicacao, sem markdown.
+
+DIFF:
+$diff"
+    echo "Gerando sugestao de commit..."
+    msg="$(printf '%s' "$prompt" | claude -p 2>/dev/null)"
+    if [ -z "$msg" ]; then
+        echo "Nao foi possivel gerar a mensagem."
+        return 1
+    fi
+    echo "----------------------------------------"
+    echo "Sugestao: $msg"
+    echo "----------------------------------------"
     echo -n "Usar essa mensagem? [y/N] "
-    read resp
+    local resp; read -r resp
     if [[ "$resp" =~ ^[Yy]$ ]]; then
-        git commit -m "$SUGESTAO"
+        git commit -m "$msg"
     else
         echo "Cancelado."
     fi
 }
-
-# Keybindings (Ctrl+Setas)
-bindkey '^[[1;5D' backward-word
-bindkey '^[[1;5C' forward-word
-
