@@ -137,6 +137,18 @@ ln -sf "$REPO_DIR/scripts/clear_home.sh"  "$BIN_DIR/clear_home";      ok "clear_
 # -------------------------------------------------------------
 #  4. Fonte com icones (MesloLGS Nerd Font) - necessaria p/ eza --icons
 # -------------------------------------------------------------
+is_wsl() { grep -qi microsoft /proc/version 2>/dev/null; }
+
+# pergunta sim/nao com default; em modo nao-interativo usa o default
+ask_yes() {  # texto  default(s/n)
+    local prompt="$1" def="${2:-s}" ans
+    if [ ! -t 0 ]; then [ "$def" = "s" ] && return 0 || return 1; fi
+    echo -n "  $prompt "
+    read -r ans || ans=""
+    ans="${ans:-$def}"
+    [[ "$ans" =~ ^[SsYy]$ ]]
+}
+
 say "Instalando fonte com icones (MesloLGS NF)"
 FONT_DIR="$HOME/.local/share/fonts"; mkdir -p "$FONT_DIR"
 FONT_BASE="https://github.com/romkatv/powerlevel10k-media/raw/master"
@@ -149,9 +161,9 @@ done
 command -v fc-cache >/dev/null 2>&1 && fc-cache -f "$FONT_DIR" >/dev/null 2>&1
 ok "fonte instalada no Linux"
 
-# No WSL o terminal e um app do Windows: a fonte precisa estar instalada
-# no Windows. Copia e registra por usuario (sem admin).
-if grep -qi microsoft /proc/version 2>/dev/null && command -v powershell.exe >/dev/null 2>&1; then
+if is_wsl && command -v powershell.exe >/dev/null 2>&1; then
+    # ---- WSL: o terminal e um app do Windows; a fonte precisa estar la ----
+    say "Ambiente WSL detectado: integrando a fonte com o Windows"
     WIN_USER="$(cmd.exe /c 'echo %USERNAME%' 2>/dev/null | tr -d '\r\n')"
     WIN_DESK="/mnt/c/Users/$WIN_USER/Desktop/MesloLGS-NF"
     if [ -n "$WIN_USER" ] && mkdir -p "$WIN_DESK" 2>/dev/null; then
@@ -169,11 +181,52 @@ Get-ChildItem "$src\*.ttf" | ForEach-Object {
 PS1
         if powershell.exe -NoProfile -ExecutionPolicy Bypass \
             -File "C:\\Users\\$WIN_USER\\Desktop\\MesloLGS-NF\\install-fonts.ps1" >/dev/null 2>&1; then
-            ok "fonte instalada no Windows (reinicie o terminal e selecione 'MesloLGS NF')"
+            ok "fonte instalada no Windows (por usuario, sem admin)"
         else
-            warn "WSL: instale a fonte manualmente a partir de $WIN_DESK"
+            warn "instale a fonte manualmente a partir de $WIN_DESK"
         fi
     fi
+
+    # ---- Configurar o Windows Terminal automaticamente (opcional) ----
+    if [ "${DOTFILES_NO_WT:-0}" != "1" ] \
+       && ask_yes "Definir 'MesloLGS NF' como fonte do Windows Terminal agora? [S/n]" s; then
+        WT_PS="$(mktemp --suffix=.ps1)"
+        cat > "$WT_PS" <<'PS1'
+$ErrorActionPreference = 'Stop'
+$paths = @()
+$paths += Get-ChildItem "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal*\LocalState\settings.json" -ErrorAction SilentlyContinue
+$paths += Get-ChildItem "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminalPreview*\LocalState\settings.json" -ErrorAction SilentlyContinue
+$unpkg = "$env:LOCALAPPDATA\Microsoft\Windows Terminal\settings.json"
+if (Test-Path $unpkg) { $paths += Get-Item $unpkg }
+if ($paths.Count -eq 0) { Write-Output "NO_WT"; exit 0 }
+foreach ($f in $paths) {
+  Copy-Item $f.FullName ($f.FullName + ".bak-dotfiles") -Force
+  $j = Get-Content $f.FullName -Raw | ConvertFrom-Json
+  if (-not $j.profiles)          { $j | Add-Member profiles ([pscustomobject]@{}) -Force }
+  if (-not $j.profiles.defaults) { $j.profiles | Add-Member defaults ([pscustomobject]@{}) -Force }
+  if (-not $j.profiles.defaults.font) { $j.profiles.defaults | Add-Member font ([pscustomobject]@{}) -Force }
+  $j.profiles.defaults.font | Add-Member face "MesloLGS NF" -Force
+  $out = $j | ConvertTo-Json -Depth 32
+  [System.IO.File]::WriteAllText($f.FullName, $out, (New-Object System.Text.UTF8Encoding $false))
+  Write-Output ("OK " + $f.FullName)
+}
+PS1
+        WT_WINPATH="$(wslpath -w "$WT_PS" 2>/dev/null)"
+        WT_OUT="$(powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$WT_WINPATH" 2>/dev/null | tr -d '\r')"
+        rm -f "$WT_PS"
+        if printf '%s' "$WT_OUT" | grep -q '^OK'; then
+            ok "Windows Terminal configurado (backup .bak-dotfiles criado)"
+            echo "  Feche e reabra o Windows Terminal para aplicar."
+        elif printf '%s' "$WT_OUT" | grep -q 'NO_WT'; then
+            warn "settings.json do Windows Terminal nao encontrado; selecione a fonte manualmente"
+        else
+            warn "nao foi possivel ajustar o Windows Terminal; selecione 'MesloLGS NF' manualmente"
+        fi
+    fi
+    echo "  VS Code (terminal): defina 'terminal.integrated.fontFamily': 'MesloLGS NF'"
+else
+    # ---- Linux nativo ----
+    echo "  Linux nativo: selecione a fonte 'MesloLGS NF' nas preferencias do seu terminal."
 fi
 
 # -------------------------------------------------------------
@@ -193,4 +246,8 @@ fi
 
 say "Concluido"
 echo "  Abra um novo terminal ou rode: zsh"
-echo "  Configure o terminal para usar a fonte 'MesloLGS NF' para ver os icones."
+if is_wsl; then
+    echo "  Feche e reabra o Windows Terminal para aplicar a fonte 'MesloLGS NF'."
+else
+    echo "  Selecione a fonte 'MesloLGS NF' nas preferencias do seu terminal."
+fi

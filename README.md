@@ -2,11 +2,15 @@
 
 Ambiente de terminal para Linux/WSL focado em produtividade e leveza:
 Zsh com prompt Git, ferramentas modernas de linha de comando e integração
-opcional com IA via Claude CLI.
+opcional com IA gratuita via GitHub Models.
 
-Projetado para instalar em qualquer máquina sem deixar resíduos: usa o
-gerenciador de pacotes nativo (`apt`) quando há `sudo`, ou binários estáticos
-em `~/.local/bin` quando não há (por exemplo, máquinas restritas sem `sudo`).
+Projetado para instalar em qualquer máquina sem deixar resíduos. O instalador
+se adapta ao ambiente automaticamente:
+
+- usa o gerenciador de pacotes nativo (`apt`) quando há `sudo`, ou binários
+  estáticos em `~/.local/bin` quando não há (ex.: máquinas restritas sem `sudo`);
+- detecta se está em **WSL** ou **Linux nativo** e, no WSL, instala a fonte de
+  ícones no Windows e oferece configurar o Windows Terminal automaticamente.
 
 ## Instalação rápida
 
@@ -84,18 +88,42 @@ gcommit           # mensagem de commit gerada por IA
 ai "como ver portas abertas?"
 ```
 
-## Fonte (ícones) no WSL
+## Fonte de ícones (Linux nativo x WSL)
 
-No WSL, quem desenha o terminal é um app do Windows, então a fonte precisa
-estar instalada no Windows, não só no Linux. O instalador detecta o WSL e
-instala a fonte no Windows automaticamente (por usuário, sem admin). Depois,
-**reinicie o terminal e selecione a fonte `MesloLGS NF`**:
+Os ícones do prompt e do `eza` precisam de uma Nerd Font (MesloLGS NF). O
+instalador trata os dois ambientes de forma diferente, detectando
+automaticamente em qual você está:
 
-- Windows Terminal: Configurações > seu perfil > Aparência > Tipo de fonte.
-- VS Code: configuração `terminal.integrated.fontFamily` com valor `MesloLGS NF`.
+**Linux nativo:** a fonte é instalada em `~/.local/share/fonts/`. Basta
+selecionar `MesloLGS NF` nas preferências do seu emulador de terminal.
 
-Em terminal Linux nativo, basta a instalação local; selecione `MesloLGS NF`
-nas preferências do seu emulador de terminal.
+**WSL:** quem desenha o terminal é um app do Windows, então a fonte precisa
+estar instalada no Windows, não só no Linux. O instalador:
+
+1. instala a fonte no Windows (por usuário, sem admin);
+2. pergunta se você quer definir `MesloLGS NF` no **Windows Terminal**
+   automaticamente (faz backup do `settings.json` em `.bak-dotfiles`);
+3. lembra como configurar o VS Code, caso use o terminal integrado.
+
+Depois disso, **feche e reabra o Windows Terminal** para aplicar.
+
+- Configurar o Windows Terminal manualmente: Configurações > seu perfil >
+  Aparência > Tipo de fonte > `MesloLGS NF`.
+- VS Code: defina `"terminal.integrated.fontFamily": "MesloLGS NF"`.
+
+Para não mexer no Windows Terminal automaticamente, rode com
+`DOTFILES_NO_WT=1 ./install.sh` (ou responda "n" na pergunta).
+
+## Variáveis de configuração do instalador
+
+Todas opcionais. Use antes do comando, ex.: `DOTFILES_NO_WT=1 ./install.sh`.
+
+| Variável | Efeito |
+|----------|--------|
+| `DOTFILES_NO_SUDO=1` | Não usa `apt`; instala tudo como binário estático em `~/.local/bin`. |
+| `DOTFILES_NO_CHSH=1` | Não altera o shell padrão (não roda `chsh`). |
+| `DOTFILES_NO_WT=1` | No WSL, não mexe no `settings.json` do Windows Terminal. |
+| `GH_MODELS_DEFAULT` | Modelo de IA usado por `gcommit` e `ai` (padrão `openai/gpt-4o-mini`). |
 
 ## Personalização
 
