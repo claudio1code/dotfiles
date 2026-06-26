@@ -84,6 +84,19 @@ gcommit           # mensagem de commit gerada por IA
 ai "como ver portas abertas?"
 ```
 
+## Fonte (ícones) no WSL
+
+No WSL, quem desenha o terminal é um app do Windows, então a fonte precisa
+estar instalada no Windows, não só no Linux. O instalador detecta o WSL e
+instala a fonte no Windows automaticamente (por usuário, sem admin). Depois,
+**reinicie o terminal e selecione a fonte `MesloLGS NF`**:
+
+- Windows Terminal: Configurações > seu perfil > Aparência > Tipo de fonte.
+- VS Code: configuração `terminal.integrated.fontFamily` com valor `MesloLGS NF`.
+
+Em terminal Linux nativo, basta a instalação local; selecione `MesloLGS NF`
+nas preferências do seu emulador de terminal.
+
 ## Personalização
 
 - Segredos locais (tokens, chaves): crie `~/.env`. Ele é carregado pelo Zsh e

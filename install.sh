@@ -139,13 +139,41 @@ ln -sf "$REPO_DIR/scripts/clear_home.sh"  "$BIN_DIR/clear_home";      ok "clear_
 # -------------------------------------------------------------
 say "Instalando fonte com icones (MesloLGS NF)"
 FONT_DIR="$HOME/.local/share/fonts"; mkdir -p "$FONT_DIR"
-if [ ! -f "$FONT_DIR/MesloLGS NF Regular.ttf" ]; then
-    curl -fsSL -o "$FONT_DIR/MesloLGS NF Regular.ttf" \
-        "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf"
-    command -v fc-cache >/dev/null 2>&1 && fc-cache -f "$FONT_DIR" >/dev/null 2>&1
-    ok "fonte instalada"
-else
-    ok "fonte ja instalada"
+FONT_BASE="https://github.com/romkatv/powerlevel10k-media/raw/master"
+FONT_VARIANTS=("Regular" "Bold" "Italic" "Bold Italic")
+for v in "${FONT_VARIANTS[@]}"; do
+    enc="${v// /%20}"
+    [ -f "$FONT_DIR/MesloLGS NF $v.ttf" ] || \
+        curl -fsSL -o "$FONT_DIR/MesloLGS NF $v.ttf" "$FONT_BASE/MesloLGS%20NF%20$enc.ttf"
+done
+command -v fc-cache >/dev/null 2>&1 && fc-cache -f "$FONT_DIR" >/dev/null 2>&1
+ok "fonte instalada no Linux"
+
+# No WSL o terminal e um app do Windows: a fonte precisa estar instalada
+# no Windows. Copia e registra por usuario (sem admin).
+if grep -qi microsoft /proc/version 2>/dev/null && command -v powershell.exe >/dev/null 2>&1; then
+    WIN_USER="$(cmd.exe /c 'echo %USERNAME%' 2>/dev/null | tr -d '\r\n')"
+    WIN_DESK="/mnt/c/Users/$WIN_USER/Desktop/MesloLGS-NF"
+    if [ -n "$WIN_USER" ] && mkdir -p "$WIN_DESK" 2>/dev/null; then
+        cp "$FONT_DIR/"MesloLGS\ NF*.ttf "$WIN_DESK/" 2>/dev/null
+        cat > "$WIN_DESK/install-fonts.ps1" <<'PS1'
+$src = "$env:USERPROFILE\Desktop\MesloLGS-NF"
+$dest = "$env:LOCALAPPDATA\Microsoft\Windows\Fonts"
+New-Item -ItemType Directory -Force -Path $dest | Out-Null
+$reg = "HKCU:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts"
+Get-ChildItem "$src\*.ttf" | ForEach-Object {
+  Copy-Item $_.FullName (Join-Path $dest $_.Name) -Force
+  $rn = [System.IO.Path]::GetFileNameWithoutExtension($_.Name) + " (TrueType)"
+  New-ItemProperty -Path $reg -Name $rn -Value (Join-Path $dest $_.Name) -PropertyType String -Force | Out-Null
+}
+PS1
+        if powershell.exe -NoProfile -ExecutionPolicy Bypass \
+            -File "C:\\Users\\$WIN_USER\\Desktop\\MesloLGS-NF\\install-fonts.ps1" >/dev/null 2>&1; then
+            ok "fonte instalada no Windows (reinicie o terminal e selecione 'MesloLGS NF')"
+        else
+            warn "WSL: instale a fonte manualmente a partir de $WIN_DESK"
+        fi
+    fi
 fi
 
 # -------------------------------------------------------------
