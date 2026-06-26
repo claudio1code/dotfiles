@@ -101,6 +101,17 @@ else
     fi
 fi
 
+# Extensao gh-models: IA gratuita (usada por 'gcommit' e 'ai')
+if command -v gh >/dev/null 2>&1; then
+    if gh extension list 2>/dev/null | grep -q 'github/gh-models'; then
+        ok "gh-models (ja presente)"
+    elif gh extension install github/gh-models >/dev/null 2>&1; then
+        ok "gh-models (IA gratuita)"
+    else
+        warn "nao foi possivel instalar gh-models agora (rode 'gh auth login' e tente de novo)"
+    fi
+fi
+
 # -------------------------------------------------------------
 #  2. Zinit (gerenciador de plugins do zsh)
 # -------------------------------------------------------------

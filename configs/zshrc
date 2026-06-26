@@ -91,20 +91,29 @@ bindkey '^[[1;5D' backward-word
 bindkey '^[[1;5C' forward-word
 
 # =============================================================
-#  INTELIGENCIA ARTIFICIAL (Claude CLI)
-#  Substitui o antigo fluxo do Gemini (auth descontinuada).
-#  Requer o Claude Code instalado e autenticado (comando claude).
+#  INTELIGENCIA ARTIFICIAL (GitHub Models - gratuito)
+#  Usa 'gh models', incluso no GitHub CLI sem custo nem chave de
+#  API: basta estar logado no gh (gh auth login). Substitui o
+#  antigo fluxo do Gemini (auth descontinuada).
+#  Modelo configuravel via GH_MODELS_DEFAULT.
 # =============================================================
+export GH_MODELS_DEFAULT="${GH_MODELS_DEFAULT:-openai/gpt-4o-mini}"
 
 # Pergunta rapida no terminal:  ai "como listo portas abertas?"
-command -v claude >/dev/null 2>&1 && alias ai='claude -p'
+if command -v gh >/dev/null 2>&1; then
+    ai() { gh models run "$GH_MODELS_DEFAULT" "$*"; }
+fi
 
 # gcommit: gera mensagem de commit (Conventional Commits) a partir
-# do que esta no stage, usando o Claude em modo headless.
+# do que esta no stage, usando GitHub Models (gratuito).
 gcommit() {
-    if ! command -v claude >/dev/null 2>&1; then
-        echo "claude CLI nao encontrado. Instale o Claude Code primeiro."
+    if ! command -v gh >/dev/null 2>&1; then
+        echo "gh (GitHub CLI) nao encontrado. Instale e rode 'gh auth login'."
         return 1
+    fi
+    if ! gh extension list 2>/dev/null | grep -q 'github/gh-models'; then
+        echo "Instalando extensao gh-models (uma vez)..."
+        gh extension install github/gh-models >/dev/null 2>&1
     fi
     if git diff --cached --quiet; then
         echo "Nada estagiado para commit (use 'git add')."
@@ -112,12 +121,14 @@ gcommit() {
     fi
     local diff prompt msg
     diff="$(git diff --cached)"
-    prompt="Aja como um formatador de texto. Escreva UMA mensagem de commit no padrao Conventional Commits (ex: 'feat: ...', 'fix: ...') baseada apenas no diff abaixo. Responda APENAS com a string da mensagem, sem aspas, sem explicacao, sem markdown.
+    prompt="Aja como um formatador de texto. Escreva UMA mensagem de commit no padrao Conventional Commits (ex: 'feat: ...', 'fix: ...') baseada apenas no diff abaixo. REGRAS: responda APENAS com a string da mensagem; sem aspas; sem explicacao; sem markdown; NAO use emojis nem gitmoji.
 
 DIFF:
 $diff"
-    echo "Gerando sugestao de commit..."
-    msg="$(printf '%s' "$prompt" | claude -p 2>/dev/null)"
+    echo "Gerando sugestao de commit (GitHub Models: $GH_MODELS_DEFAULT)..."
+    msg="$(printf '%s' "$prompt" | gh models run "$GH_MODELS_DEFAULT" 2>/dev/null)"
+    # remove eventuais aspas, espacos nas pontas e emojis no inicio da linha
+    msg="$(printf '%s' "$msg" | sed -e 's/^["'\'' ]*//' -e 's/["'\'' ]*$//' | head -1)"
     if [ -z "$msg" ]; then
         echo "Nao foi possivel gerar a mensagem."
         return 1

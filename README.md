@@ -59,18 +59,21 @@ binários estáticos, que são mais leves e rápidos.
 
 Os scripts ficam disponíveis no `PATH` como `update_dotfiles` e `clear_home`.
 
-## Integração com IA (Claude CLI)
+## Integração com IA (GitHub Models, gratuito)
 
 O fluxo antigo com Gemini foi removido (autenticação descontinuada). No lugar,
-a configuração usa o **Claude CLI** (`claude`), que você instala e autentica
-separadamente:
+a configuração usa o **GitHub Models** através do `gh models` — gratuito,
+incluso no GitHub CLI, sem chave de API. Basta estar logado: `gh auth login`.
+O instalador já adiciona a extensão automaticamente.
 
-- `ai "sua pergunta"` — pergunta rápida no terminal (`claude -p`).
-- `gcommit` — gera uma mensagem de commit no padrão Conventional Commits a
-  partir do que está no stage (`git add`), pede confirmação e faz o commit.
+- `ai "sua pergunta"` — pergunta rápida no terminal.
+- `gcommit` — gera uma mensagem de commit no padrão Conventional Commits (sem
+  emojis) a partir do que está no stage (`git add`), pede confirmação e commita.
 
-Se o comando `claude` não estiver instalado, esses atalhos simplesmente avisam
-e não quebram o terminal.
+O modelo padrão é `openai/gpt-4o-mini`; para trocar, defina a variável
+`GH_MODELS_DEFAULT` (ex.: `export GH_MODELS_DEFAULT="meta/llama-3.3-70b-instruct"`).
+Veja os modelos disponíveis com `gh models list`. Se o `gh` não estiver
+instalado/logado, os atalhos apenas avisam e não quebram o terminal.
 
 ## Comandos úteis depois de instalar
 
