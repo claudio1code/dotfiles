@@ -23,6 +23,41 @@ cd ~/dotfiles
 ./install.sh
 ```
 
+Assim que roda, o instalador abre um checklist para você escolher o que
+instalar (setas para navegar, espaço para marcar/desmarcar, enter confirma):
+
+```
+┌───────────────────────── Ferramentas (dotfiles) ─────────────────────────┐
+│ Espaco marca/desmarca, enter confirma, esc cancela:                      │
+│                                                                            │
+│  [*] cli_tools   eza, bat, fd, ripgrep, zoxide, fzf, gh                  │
+│  [*] claude      Claude Desktop + Claude Code CLI                        │
+│  [ ] docker      Docker + Docker Compose (requer sudo)                   │
+│  [ ] node        Node.js 22 + npm, via NodeSource (requer sudo)          │
+│  [ ] utils       tmux, htop, ncdu, jq, direnv                            │
+│  [ ] lazygit     lazygit (TUI para git)                                  │
+│  [ ] python      Python: pip, pipx e build-essential (requer sudo)       │
+│  [ ] vscode      VS Code (requer sudo)                                   │
+│                                                                            │
+│                    <Ok>                    <Cancel>                      │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+`[*]` já vem marcado (o básico); o resto fica de fora até você marcar. Sem
+`whiptail`/`dialog` instalados, o instalador cai para uma pergunta `[S/n]`
+por item, direto no terminal.
+
+Depois da escolha, ele segue sozinho, sem mais perguntas (exceto no WSL, que
+tem uma pergunta extra sobre o Windows Terminal — veja mais abaixo):
+
+```
+checklist  →  pacotes essenciais (zsh, git, curl)
+           →  itens marcados (cli_tools, claude, docker, node, ...)
+           →  zinit + symlinks (~/.zshrc, ~/.vimrc)
+           →  fonte com icones (MesloLGS NF)
+           →  zsh como shell padrao
+```
+
 O instalador é idempotente: pode rodar quantas vezes quiser. Ao final ele define
 o `zsh` como shell padrão automaticamente (vale no próximo login); para não
 alterar o shell padrão, rode com `DOTFILES_NO_CHSH=1 ./install.sh`. Abra um novo
