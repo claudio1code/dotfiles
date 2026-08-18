@@ -7,6 +7,9 @@ opcional com IA gratuita via GitHub Models.
 Projetado para instalar em qualquer máquina sem deixar resíduos. O instalador
 se adapta ao ambiente automaticamente:
 
+- pergunta o que instalar através de um **checklist interativo** (`whiptail`/
+  `dialog`; sem eles, cai para perguntas `[S/n]` no terminal) — o básico já
+  vem pré-marcado, o resto é opcional;
 - usa o gerenciador de pacotes nativo (`apt`) quando há `sudo`, ou binários
   estáticos em `~/.local/bin` quando não há (ex.: máquinas restritas sem `sudo`);
 - detecta se está em **WSL** ou **Linux nativo** e, no WSL, instala a fonte de
@@ -37,27 +40,39 @@ não estiver presente, o instalador avisa o comando para instalá-lo.
 
 ## O que é instalado
 
+Sempre instalado (infraestrutura do próprio ambiente, não entra no checklist):
+
 | Ferramenta | Função |
 |------------|--------|
 | Zsh + Zinit | Shell e gerenciador de plugins (carregamento leve) |
 | zsh-autosuggestions, zsh-syntax-highlighting | Sugestões e cores ao digitar |
-| eza | Substituto moderno do `ls` (com ícones) |
-| bat | `cat` com realce de sintaxe |
-| fd | `find` mais rápido e simples |
-| ripgrep (`rg`) | Busca em texto extremamente rápida |
-| zoxide | `cd` inteligente, baseado em frequência |
-| fzf | Busca fuzzy interativa no terminal |
-| gh | GitHub CLI (PRs, issues, releases) |
 | MesloLGS NF | Fonte com ícones para o prompt e o `eza` |
-| Claude Desktop | App desktop da Anthropic (via apt, precisa de sudo) |
-| Claude Code CLI | CLI de agente de código da Anthropic |
+
+Escolhido no checklist ao rodar `./install.sh` (marcado = instala):
+
+| Item | Função | Padrão |
+|------|--------|--------|
+| eza, bat, fd, ripgrep, zoxide, fzf, gh | Ferramentas modernas de linha de comando | marcado |
+| Claude Desktop + Claude Code CLI | App e CLI de agente de código da Anthropic (desktop via apt, precisa de sudo) | marcado |
+| Docker + Docker Compose | Containers (precisa de sudo) | desmarcado |
+| Node.js 22 + npm | Via NodeSource (precisa de sudo) | desmarcado |
+| tmux, htop, ncdu, jq, direnv | Multiplexador de terminal, monitor de processos, uso de disco, JSON, variáveis de ambiente por diretório | desmarcado |
+| lazygit | TUI para Git | desmarcado |
+| Python: pip, pipx, build-essential | Empacotamento Python e toolchain de build (precisa de sudo) | desmarcado |
+| VS Code | Editor (precisa de sudo) | desmarcado |
+
+Sem `sudo`/`apt`, os itens marcados como "precisa de sudo" são pulados
+(com aviso); `jq`, `direnv` e `lazygit` ainda funcionam via binário estático
+em `~/.local/bin`.
 
 Por que não Homebrew: no Linux/WSL ele é pesado e lento. Aqui usamos `apt` ou
 binários estáticos, que são mais leves e rápidos.
 
 ## Estrutura
 
-- `install.sh` — instalador único e idempotente.
+- `install.sh` — instalador único e idempotente, com checklist interativo.
+- `scripts/common.sh` — funções compartilhadas do instalador (cores, helpers
+  de download, detecção de `apt`/`sudo`); não é executado diretamente.
 - `configs/zshrc` — configuração do Zsh (link para `~/.zshrc`).
 - `configs/.vimrc` — configuração básica do Vim (link para `~/.vimrc`).
 - `scripts/update.sh` — atualiza o repo e reaplica o instalador.
