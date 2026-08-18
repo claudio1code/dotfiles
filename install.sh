@@ -260,6 +260,37 @@ if command -v zsh >/dev/null 2>&1 && [ "${DOTFILES_NO_CHSH:-0}" != "1" ] \
     fi
 fi
 
+# -------------------------------------------------------------
+#  6. Claude Desktop e Claude Code CLI
+# -------------------------------------------------------------
+say "Instalando Claude Desktop e Claude Code CLI"
+
+if [ "$USE_APT" -eq 1 ]; then
+    if command -v claude-desktop >/dev/null 2>&1; then
+        ok "claude-desktop (ja presente)"
+    else
+        $SUDO curl -fsSLo /usr/share/keyrings/claude-desktop-archive-keyring.asc \
+            https://downloads.claude.ai/claude-desktop/key.asc
+        echo "deb [signed-by=/usr/share/keyrings/claude-desktop-archive-keyring.asc] https://downloads.claude.ai/claude-desktop/apt/stable stable main" \
+            | $SUDO tee /etc/apt/sources.list.d/claude-desktop.list >/dev/null
+        $SUDO apt-get update -y
+        if $SUDO apt-get install -y claude-desktop; then
+            ok "claude-desktop"
+        else
+            warn "claude-desktop: falha na instalacao via apt"
+        fi
+    fi
+else
+    warn "claude-desktop precisa de apt+sudo; pulado nesta maquina"
+fi
+
+if command -v claude >/dev/null 2>&1; then
+    ok "claude (CLI) ja presente"
+else
+    curl -fsSL https://claude.ai/install.sh | bash
+    ok "claude (CLI) instalado"
+fi
+
 say "Concluido"
 echo "  Abra um novo terminal ou rode: zsh"
 if is_wsl; then

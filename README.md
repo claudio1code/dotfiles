@@ -49,6 +49,8 @@ não estiver presente, o instalador avisa o comando para instalá-lo.
 | fzf | Busca fuzzy interativa no terminal |
 | gh | GitHub CLI (PRs, issues, releases) |
 | MesloLGS NF | Fonte com ícones para o prompt e o `eza` |
+| Claude Desktop | App desktop da Anthropic (via apt, precisa de sudo) |
+| Claude Code CLI | CLI de agente de código da Anthropic |
 
 Por que não Homebrew: no Linux/WSL ele é pesado e lento. Aqui usamos `apt` ou
 binários estáticos, que são mais leves e rápidos.
