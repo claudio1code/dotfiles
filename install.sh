@@ -66,8 +66,22 @@ install_tools_static() {
     install_bin sharkdp/fd          fd     "$MUSL" || true
     install_bin BurntSushi/ripgrep  rg     "$MUSL" || true
     install_bin ajeetdsouza/zoxide  zoxide "$MUSL" || true
-    install_bin junegunn/fzf        fzf    'linux_amd64\.tar\.gz$' || true
     install_gh_static
+}
+
+# fzf: forcado via binario estatico em todos os modos (mesmo com apt),
+# pois o apt do Ubuntu/Debian trava numa versao antiga (ex: 0.44) que
+# nao suporta 'fzf --zsh', usado no zshrc para a integracao do shell.
+install_fzf_static() {
+    if [ -x "$BIN_DIR/fzf" ] && "$BIN_DIR/fzf" --zsh >/dev/null 2>&1; then
+        ok "fzf (ja presente, versao compativel)"; return 0
+    fi
+    local url; url="$(latest_asset_url junegunn/fzf 'linux_amd64\.tar\.gz$' || true)"
+    if [ -z "$url" ]; then err "fzf: asset nao encontrado"; return 1; fi
+    local arc="$TMP/$(basename "$url")"; curl -fsSL -o "$arc" "$url"
+    local ex="$TMP/ex_fzf"; mkdir -p "$ex"; tar -xzf "$arc" -C "$ex"
+    install -m 0755 "$(find "$ex" -type f -name fzf | head -1)" "$BIN_DIR/fzf"
+    ok "fzf -> $BIN_DIR/fzf (versao com suporte a --zsh)"
 }
 
 install_gh_static() {
@@ -88,7 +102,7 @@ if [ "$USE_APT" -eq 1 ]; then
     echo "  usando apt (pode pedir sua senha de sudo)"
     $SUDO apt-get update -y
     # instala uma a uma para nao abortar se algum pacote faltar no repo
-    for pkg in zsh git curl eza bat fd-find ripgrep fzf zoxide; do
+    for pkg in zsh git curl eza bat fd-find ripgrep zoxide; do
         if $SUDO apt-get install -y "$pkg" >/dev/null 2>&1; then ok "$pkg"; else warn "$pkg indisponivel no apt"; fi
     done
     # gh nao vem nos repos padrao: instala binario estatico user-local
@@ -100,6 +114,8 @@ else
         warn "zsh nao instalado (precisa de sudo). Rode:  sudo apt install -y zsh"
     fi
 fi
+# fzf: sempre via binario estatico (apt costuma ter versao antiga demais)
+install_fzf_static
 
 # Extensao gh-models: IA gratuita (usada por 'gcommit' e 'ai')
 if command -v gh >/dev/null 2>&1; then
