@@ -516,6 +516,21 @@ if command -v zsh >/dev/null 2>&1 && [ "${DOTFILES_NO_CHSH:-0}" != "1" ] \
     fi
 fi
 
+# Fallback: terminais que ainda abrem em bash (sessao grafica com SHELL antigo,
+# ou chsh que falhou) passam para o zsh via ~/.bashrc. Idempotente.
+if command -v zsh >/dev/null 2>&1 && [ "${DOTFILES_NO_CHSH:-0}" != "1" ] \
+   && ! grep -qs 'exec .*zsh -l' "$HOME/.bashrc"; then
+    cat >> "$HOME/.bashrc" <<'EOF'
+
+# Inicia o zsh em shells interativos (o terminal ainda abre em bash)
+if [[ $- == *i* && -z "$ZSH_VERSION" && -x /usr/bin/zsh ]]; then
+    export SHELL=/usr/bin/zsh
+    exec /usr/bin/zsh -l
+fi
+EOF
+    ok "~/.bashrc passa para o zsh em shells interativos"
+fi
+
 # -------------------------------------------------------------
 #  7. Claude Desktop e Claude Code CLI (opcional, do checklist)
 # -------------------------------------------------------------
