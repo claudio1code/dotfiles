@@ -50,7 +50,9 @@ fi
 # --- 4. projetos, arquivos e configuracoes ---
 # Configs especificas do COSMIC/Pop (cosmic, dconf, gtk) nao sao restauradas
 # no Ubuntu: o dconf do Pop mistura chaves incompativeis com o GNOME.
-EXCL=(--exclude='.config/cosmic*' --exclude='.config/dconf' --exclude='.config/gtk-3.0' --exclude='.config/gtk-4.0')
+# tools/dotfiles tambem fica de fora: o backup tem a versao antiga do repo e
+# sobrescreveria o clone atual (a versao boa vem do GitHub).
+EXCL=(--exclude='tools/dotfiles' --exclude='.config/cosmic*' --exclude='.config/dconf' --exclude='.config/gtk-3.0' --exclude='.config/gtk-4.0')
 say "Restaurando projetos (dev), arquivos pessoais e configuracoes"
 for f in dev pessoais configs configs-resto; do
     [ -f "$SRC/$f.tar.gz" ] || continue
