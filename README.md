@@ -186,3 +186,26 @@ Todas opcionais. Use antes do comando, ex.: `DOTFILES_NO_WT=1 ./install.sh`.
 ## Licença
 
 MIT. Veja `LICENSE`.
+
+## Migrando para uma maquina nova
+
+1. Instale o Ubuntu (sessao **Ubuntu on Xorg** na tela de login).
+2. Clone e rode o instalador, marcando `git_setup`, `android`, `apps`, `vscode` e `vscode_ext`:
+
+   ```bash
+   git clone https://github.com/claudio1code/dotfiles.git ~/tools/dotfiles
+   ~/tools/dotfiles/install.sh
+   ```
+
+3. Restaure o backup do Google Drive (chaves, projetos, arquivos e configuracoes):
+
+   ```bash
+   ~/tools/dotfiles/scripts/restore-backup.sh
+   ```
+
+4. Copie `configs/env.example` para `~/.env` e preencha as senhas do keystore.
+   O `~/.env` nunca deve ser versionado.
+
+Itens do checklist adicionais: `vscode_ext` (extensoes e settings), `android`
+(JDK 21 e Android SDK), `apps` (Brave, Thunderbird, flameshot, Spotify, Discord)
+e `git_setup` (nome/e-mail e login do GitHub).

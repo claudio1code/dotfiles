@@ -28,7 +28,7 @@ detect_apt_mode
 #  Infraestrutura (zsh/git/curl, zinit, symlinks, fonte) nao entra
 #  no checklist: e sempre aplicada, e necessaria para o resto funcionar.
 # -------------------------------------------------------------
-ITEM_KEYS=(cli_tools claude docker node utils lazygit python vscode)
+ITEM_KEYS=(cli_tools claude docker node utils lazygit python vscode vscode_ext android apps git_setup)
 declare -A ITEM_DESC=(
     [cli_tools]="eza, bat, fd, ripgrep, zoxide, fzf, gh"
     [claude]="Claude Desktop + Claude Code CLI"
@@ -38,10 +38,15 @@ declare -A ITEM_DESC=(
     [lazygit]="lazygit (TUI para git)"
     [python]="Python: pip, pipx e build-essential (requer sudo)"
     [vscode]="VS Code (requer sudo)"
+    [vscode_ext]="VS Code: extensoes e settings do dotfiles"
+    [android]="JDK 21 + Android SDK (build do AppFood)"
+    [apps]="Brave, Thunderbird, flameshot, Spotify, Discord (sudo)"
+    [git_setup]="Git: nome/e-mail e login no GitHub (gh)"
 )
 declare -A ITEM_DEFAULT=(
     [cli_tools]=ON [claude]=ON
     [docker]=OFF [node]=OFF [utils]=OFF [lazygit]=OFF [python]=OFF [vscode]=OFF
+    [vscode_ext]=OFF [android]=OFF [apps]=OFF [git_setup]=ON
 )
 
 contains() {  # valor -- true se estiver em $SELECTED
@@ -57,7 +62,7 @@ select_with_menu() {  # nome_do_binario (whiptail ou dialog)
     done
     local out
     if ! out=$("$tool" --title "Ferramentas (dotfiles)" \
-        --checklist "Espaco marca/desmarca, enter confirma, esc cancela:" 20 78 "${#ITEM_KEYS[@]}" \
+        --checklist "Espaco marca/desmarca, enter confirma, esc cancela:" 26 78 "${#ITEM_KEYS[@]}" \
         "${args[@]}" 3>&1 1>&2 2>&3); then
         err "instalacao cancelada"
         exit 1
@@ -92,8 +97,8 @@ else
     select_with_prompts
 fi
 
-if [ "$USE_APT" -ne 1 ] && { contains docker || contains node || contains python || contains vscode; }; then
-    warn "sem apt/sudo disponivel: docker, node, python e/ou vscode serao pulados"
+if [ "$USE_APT" -ne 1 ] && { contains docker || contains node || contains python || contains vscode || contains apps; }; then
+    warn "sem apt/sudo disponivel: docker, node, python, vscode e/ou apps serao pulados"
 fi
 
 # -------------------------------------------------------------
@@ -213,6 +218,123 @@ install_vscode() {
         | $SUDO tee /etc/apt/sources.list.d/vscode.list >/dev/null
     $SUDO apt-get update -y
     if $SUDO apt-get install -y code; then ok "vscode"; else err "falha ao instalar o vscode"; fi
+}
+
+install_vscode_ext() {
+    if ! command -v code >/dev/null 2>&1; then warn "vscode nao instalado; marque tambem o item 'vscode'"; return 0; fi
+    say "Configurando VS Code (extensoes e settings)"
+    local ext
+    while IFS= read -r ext; do
+        [ -z "$ext" ] && continue
+        if code --install-extension "$ext" --force >/dev/null 2>&1; then ok "extensao $ext"; else warn "extensao $ext falhou"; fi
+    done < "$REPO_DIR/configs/vscode-extensions.txt"
+    local dest="$HOME/.config/Code/User/settings.json"
+    if [ -e "$dest" ]; then
+        ok "settings.json ja existe (mantido)"
+    else
+        mkdir -p "$(dirname "$dest")"; cp "$REPO_DIR/configs/vscode-settings.json" "$dest"; ok "settings.json"
+    fi
+}
+
+# JDK 21 (Temurin) em ~/.local/jdk21 + Android SDK em ~/Android/Sdk.
+# As variaveis JAVA_HOME/ANDROID_HOME ja estao no configs/zshrc.
+install_android() {
+    say "Instalando JDK 21 e Android SDK"
+    if [ -x "$HOME/.local/jdk21/bin/java" ]; then
+        ok "jdk21 (ja presente)"
+    else
+        local jdk="$TMP/jdk21.tar.gz"
+        if curl -fsSL -o "$jdk" "https://api.adoptium.net/v3/binary/latest/21/ga/linux/x64/jdk/hotspot/normal/eclipse"; then
+            mkdir -p "$HOME/.local/jdk21"; tar -xzf "$jdk" -C "$HOME/.local/jdk21" --strip-components=1
+            ok "jdk21 -> ~/.local/jdk21"
+        else
+            err "falha ao baixar o JDK 21"; return 0
+        fi
+    fi
+    local sdk="$HOME/Android/Sdk"
+    if [ ! -x "$sdk/cmdline-tools/latest/bin/sdkmanager" ]; then
+        command -v unzip >/dev/null 2>&1 || { [ "$USE_APT" -eq 1 ] && $SUDO apt-get install -y unzip >/dev/null 2>&1; }
+        local zip="$TMP/cmdline-tools.zip"
+        if curl -fsSL -o "$zip" "https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip"; then
+            mkdir -p "$sdk/cmdline-tools"; unzip -q -o "$zip" -d "$TMP/cmdtools"
+            rm -rf "$sdk/cmdline-tools/latest"; mv "$TMP/cmdtools/cmdline-tools" "$sdk/cmdline-tools/latest"
+            ok "cmdline-tools"
+        else
+            err "falha ao baixar o cmdline-tools"; return 0
+        fi
+    else
+        ok "cmdline-tools (ja presente)"
+    fi
+    export JAVA_HOME="$HOME/.local/jdk21" ANDROID_HOME="$sdk"
+    local sm="$sdk/cmdline-tools/latest/bin/sdkmanager"
+    yes | "$sm" --licenses >/dev/null 2>&1 || true
+    if "$sm" "platform-tools" "platforms;android-36" "build-tools;35.0.0" "build-tools;36.0.0" >/dev/null 2>&1; then
+        ok "platform-tools, android-36, build-tools 35 e 36"
+    else
+        warn "sdkmanager falhou; rode manualmente: sdkmanager 'platform-tools' 'platforms;android-36' 'build-tools;36.0.0'"
+    fi
+}
+
+install_apps() {
+    if [ "$USE_APT" -ne 1 ]; then warn "apps precisam de apt + sudo; pulado"; return 0; fi
+    say "Instalando Brave, Thunderbird, flameshot, rsync, wl-clipboard, Spotify e Discord"
+    if ! command -v brave-browser >/dev/null 2>&1; then
+        $SUDO install -m 0755 -d /etc/apt/keyrings
+        $SUDO curl -fsSLo /etc/apt/keyrings/brave-browser-archive-keyring.gpg \
+            https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+        echo "deb [signed-by=/etc/apt/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" \
+            | $SUDO tee /etc/apt/sources.list.d/brave-browser-release.list >/dev/null
+        $SUDO apt-get update -y
+    fi
+    local pkg
+    for pkg in brave-browser thunderbird flameshot rsync wl-clipboard unzip; do
+        if $SUDO apt-get install -y "$pkg" >/dev/null 2>&1; then ok "$pkg"; else warn "$pkg indisponivel no apt"; fi
+    done
+    if command -v snap >/dev/null 2>&1; then
+        for pkg in spotify discord; do
+            if $SUDO snap install "$pkg" >/dev/null 2>&1; then ok "$pkg (snap)"; else warn "$pkg: falha no snap"; fi
+        done
+    else
+        warn "snap indisponivel: instale Spotify e Discord manualmente"
+    fi
+    echo "  Astah Community: baixe o .deb em astah.net (nao ha repositorio apt)."
+}
+
+# Identidade do git + autenticacao do GitHub (usada pelo credential helper).
+# Para nao perguntar: DOTFILES_GIT_NAME="..." DOTFILES_GIT_EMAIL="..." ./install.sh
+install_git_setup() {
+    say "Configurando git e GitHub"
+    local name email
+    name="$(git config --global user.name 2>/dev/null || true)"
+    email="$(git config --global user.email 2>/dev/null || true)"
+    if [ -z "$name" ]; then
+        name="${DOTFILES_GIT_NAME:-}"
+        if [ -z "$name" ] && [ -t 0 ]; then read -r -p "  Nome para os commits: " name || name=""; fi
+        [ -n "$name" ] && git config --global user.name "$name"
+    fi
+    if [ -z "$email" ]; then
+        email="${DOTFILES_GIT_EMAIL:-}"
+        if [ -z "$email" ] && [ -t 0 ]; then read -r -p "  E-mail para os commits: " email || email=""; fi
+        [ -n "$email" ] && git config --global user.email "$email"
+    fi
+    git config --global init.defaultBranch main
+    git config --global pull.rebase false
+    ok "git: $(git config --global user.name) <$(git config --global user.email)>"
+    local gh_bin; gh_bin="$(command -v gh || echo "$BIN_DIR/gh")"
+    if [ -x "$gh_bin" ]; then
+        if "$gh_bin" auth status >/dev/null 2>&1; then
+            ok "gh (ja autenticado)"
+        elif [ -t 0 ]; then
+            "$gh_bin" auth login || warn "gh auth login nao concluido"
+        else
+            warn "rode 'gh auth login' depois"
+        fi
+        "$gh_bin" auth setup-git >/dev/null 2>&1 && ok "git usando as credenciais do gh"
+    else
+        warn "gh nao instalado; marque o item 'cli_tools'"
+    fi
+    [ -f "$HOME/.env" ] || { cp "$REPO_DIR/configs/env.example" "$HOME/.env" && chmod 600 "$HOME/.env" \
+        && ok "~/.env criado a partir de configs/env.example (preencha as senhas)"; }
 }
 
 # direnv so funciona com o hook no shell; adiciona uma vez, de forma
@@ -436,6 +558,10 @@ contains utils   && install_utils
 contains lazygit && install_lazygit
 contains python  && install_python
 contains vscode  && install_vscode
+contains apps    && install_apps
+contains vscode_ext && install_vscode_ext
+contains android && install_android
+contains git_setup && install_git_setup
 
 say "Concluido"
 echo "  Abra um novo terminal ou rode: zsh"

@@ -49,6 +49,19 @@ alias ç='clear'
 alias gs='git status'
 alias gl='git log --oneline --graph --decorate -20'
 
+# --- Play Store (AppFood) ---
+# As senhas NAO ficam aqui: defina APPFOOD_UPLOAD_STORE_PASSWORD e
+# APPFOOD_UPLOAD_KEY_PASSWORD em ~/.env (veja configs/env.example).
+play() {
+    export APPFOOD_UPLOAD_STORE_FILE="$HOME/.keys/appfood-upload-key.jks"
+    export APPFOOD_UPLOAD_KEY_ALIAS='appfood-upload'
+    if [ -z "${APPFOOD_UPLOAD_STORE_PASSWORD:-}" ] || [ -z "${APPFOOD_UPLOAD_KEY_PASSWORD:-}" ]; then
+        echo "Defina APPFOOD_UPLOAD_STORE_PASSWORD e APPFOOD_UPLOAD_KEY_PASSWORD em ~/.env"
+        return 1
+    fi
+    echo "Variaveis de assinatura do AppFood carregadas."
+}
+
 # --- ZOXIDE (cd inteligente) ---
 command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
 
@@ -141,3 +154,8 @@ $diff"
         echo "Cancelado."
     fi
 }
+
+# --- AppFood Android: JDK 21 e Android SDK (build de release do frontend) ---
+[ -d "$HOME/.local/jdk21" ] && export JAVA_HOME="$HOME/.local/jdk21" && export PATH="$JAVA_HOME/bin:$PATH"
+[ -d "$HOME/Android/Sdk" ] && export ANDROID_HOME="$HOME/Android/Sdk" \
+    && export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools"
